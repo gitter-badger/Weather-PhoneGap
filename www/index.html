@@ -13,31 +13,42 @@
 			display: block;
 			width: 100%;
         }
-        .gold {
+        .label {
             background-color: gold !important;
-            font-size: 2em;
+            font-size: 1.5em;
         }
 	</style>
-
+    
     <body>
-    	<div id="home" data-role="page">
-	        <img class="image" src="img/backgrdImage.png"/>
-            <div data-role="content">
-                <p class="ui-btn ui-shadow ui-corner-all gold">Choose below</p>
-            </div><!-- end content -->
-	        <div data-role="footer" data-position="fixed" data-theme="b">
-	            <div data-role="navbar">
-	                <ul>
-	                    <li><a href="#">Home</a>
-	                    <li><a href="#">Location</a></li>
-	                    <li><a href="#">GPS</a></li>
-	                </ul>
-	            </div><!-- end navbar -->
-	        </div><!-- end footer -->
-		</div><!-- end home -->
-        
-		
-		<script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+    <div id="home" data-role="page"><!-- start home -->
+        <div data-role="header" data-position="fixed"><!-- start header -->
+            <img class="image" src="img/backgrdImage.png"/>
+        </div><!-- end header -->
+	    <br/><br/>
+	    <div data-role="content"><!-- start content -->
+	        <p class="ui-btn ui-shadow ui-corner-all label">Choose below</p>
+	    </div><!-- end content -->
+	        
+	    <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
+	        <div data-role="navbar">
+	            <ul>
+	                <li><a href="#">Home</a>
+	                <li><a href="#">Location</a></li>
+	                <li><a href="#">GPS</a></li>
+	            </ul>
+	        </div><!-- end navbar -->
+	    </div><!-- end footer -->
+    </div><!-- end home -->
+
+    <div id="locationEntry" data-role="page"><!-- start locationEntry -->
+        <div data-role="header" data-position="fixed"><!-- start header -->
+            <img class="image" src="img/headerImage.png"/>
+        </div><!-- end header -->
+
+    </div><!-- end locationEntry -->
+
+
+    <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 		<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
         <script type="text/javascript" src="cordova.js"></script>        
     </body>
