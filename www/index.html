@@ -5,80 +5,150 @@
         <meta name="format-detection" content="telephone=no" />
         <meta name="msapplication-tap-highlight" content="no" />        
         <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width, height=device-height"/>
-        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css">		
-        <title>Weather</title>
-    </head>
-	<style>
-		.image {
-			display: block;
-			width: 100%;
-        }
-        .label {
-            background-color: gold !important;
-            font-size: 1.5em;
-        }
-	</style>
-    
-    <body>
-    <div id="home" data-role="page"><!-- start home page -->
-        <div data-role="header" data-position="fixed"><!-- start header -->
-            <img class="image" src="img/backgrdImage.png"/>
-        </div><!-- end header -->
-
-        <br/><br/>
-
-	    <div data-role="content"><!-- start content -->
-	        <p class="ui-btn ui-shadow ui-corner-all label">Choose below</p>
-	    </div><!-- end content -->
-	        
-	    <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
-	        <div data-role="navbar">
-	            <ul>
-	                <li><a href="#home">Home</a>
-	                <li><a href="#locationEntry">Location</a></li>
-	                <li><a href="#">GPS</a></li>
-	            </ul>
-	        </div><!-- end navbar -->
-	    </div><!-- end footer -->
-    </div><!-- end home page -->
-
-    <div id="locationEntry" data-role="page"><!-- start locationEntry page -->
-        <div data-role="header" data-position="fixed"><!-- start header -->
-            <img class="image" src="img/headerImage.png"/>
-        </div><!-- end header -->
-
-        <div data-role="content"><!-- start content -->
-            <p class="ui-btn ui-shadow ui-corner-all label">LOCATION</p>
-            <br/>
-            <label for="cityInput">City:</label>
-            <input type="text" name="cityInput" id="cityInput" value=""/>
-
-            <label for="countryInput">Country:</label>
-            <select name="countryInput" id="countryInput" data-native-menu="false">
-                <option value="usa">USA</option>
-                <option value="malaysia">Malaysia</option>
-                <option value="Canada">Canada</option>
-                <option value="UK">UK</option>
-                <option value="Germany">Germany</option>
-                <option value="France">France</option>
-                <option value="Russia">Russia</option>
-                <option value="Singapore">Singapore</option>
-                <option value="India">India</option>
-                <option value="Sri Lanka">Sri Lanka</option>
-                <option value="Japan">Japan</option>
-                <option value="Italy">Italy</option>
-            </select>
-
-
-        </div><!-- end content -->
-
-
-
-    </div><!-- end locationEntry page -->
-
-
-    <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="css/jquery.mobile-1.4.5.min.css">
+        <script type="text/javascript" src="js/jquery-2.1.3.min.js"></script>
 		<script type="text/javascript" src="js/jquery.mobile-1.4.5.min.js"></script>
         <script type="text/javascript" src="cordova.js"></script>        
+        <title>Weather</title>
+        <style>
+            .image {
+                display: block;
+                width: 100%;
+            }
+            .label {
+                background-color: gold !important;
+                font-size: 1.3em;
+                font-family: Arial Black;
+                text-decoration: underline !important;
+            }
+            .weatherResult {
+                padding: 1em;
+                background-color: #ECECEC;
+                -webkit-border-radius: 20px;
+                -moz-border-radius: 20px;
+                border-radius: 20px;
+            }
+            .resultOutput {
+                background-color: gold !important;
+                font-size: 1.3em;
+                font-family: Arial Black;
+                text-decoration: underline !important;
+            }
+            .submitButton {
+                background-color: lightskyblue !important;
+            }
+        </style>
+        <script>
+            function weatherReport() { // triggered with 'Get Weather Report' button
+                //Get user entered city
+                var citySearch = document.getElementById("cityInput").value;
+                    //DEBUG
+                    alert("citySearch: " + citySearch);
+                    
+                //Get user chosen country REF: http://www.trottyzone.com/using-javascript-get-value-input-select/
+                var countrySelectInput = document.getElementById("countryInput");
+                var countryChosen = countrySelectInput.value;
+                    //DEBUG
+                    alert("countryChosen: " + countryChosen);    
+
+                //Get weather JSON and parse the weather report information
+                //Ref: http://www.jquerybyexample.net/2012/05/how-to-read-and-parse-json-using-jquery.html
+                var weatherAPI = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
+
+                $.getJSON(weatherAPI, function (data) {
+
+                    $.each(data, function(key, value) {
+                        //DEBUG
+                        alert("dataJSON: " + key + " - " + value);
+                    });
+
+                   
+
+                });
+
+                alert("EXIT SCRIPT");
+            }
+        </script>
+        
+    </head>
+    <body>
+        <div id="home" data-role="page"><!-- start home page -->
+            <div data-role="header" data-position="fixed"><!-- start header -->
+                <img class="image" src="img/backgrdImage.png"/>
+            </div><!-- end header -->
+
+            <br/><br/>
+
+	        <div data-role="content"><!-- start content -->
+	            <p class="ui-btn ui-shadow ui-corner-all label">Choose below</p>
+	        </div><!-- end content -->
+	        
+	        <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
+	            <div data-role="navbar">
+	                <ul>
+	                    <li><a href="#home">Home</a>
+	                    <li><a href="#locationEntry">Location</a></li>
+	                    <li><a href="#">GPS</a></li>
+	                </ul>
+	            </div><!-- end navbar -->
+	        </div><!-- end footer -->
+        </div><!-- end home page -->
+
+        <div id="locationEntry" data-role="page"><!-- start locationEntry page -->
+            <div data-role="header" data-position="fixed"><!-- start header -->
+                <img class="image" src="img/headerImage.png"/>
+            </div><!-- end header -->
+
+            <div data-role="content"><!-- start content -->
+                <p class="ui-btn ui-shadow ui-corner-all label">LOCATION</p>
+                <br/>
+                <label for="cityInput">City:</label>
+                <input type="text" name="cityInput" id="cityInput" value=""/>
+
+                <label for="countryInput">Country:</label>
+                <select name="countryInput" id="countryInput" data-native-menu="false">
+                    <option selected="selected" value="US">USA</option>
+                    <option value="MY">Malaysia</option>
+                    <option value="CA">Canada</option>
+                    <option value="GB">UK</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="RU">Russia</option>
+                    <option value="SG">Singapore</option>
+                    <option value="IN">India</option>
+                    <option value="CN">China</option>
+                    <option value="JP">Japan</option>
+                    <option value="IT">Italy</option>
+                </select>
+                <br/>
+                <a href="javascript:weatherReport()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Get Weather Report</a><!-- submit Button -->
+                
+                <br/>
+                <hr/>
+                <br/>
+                
+                <div class="weatherResult"><!-- Weather Result Output -->
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">WEATHER REPORT</p>
+
+                    
+
+
+                </div>
+
+
+
+            </div><!-- end content -->
+
+            <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
+	            <div data-role="navbar">
+	                <ul>
+	                    <li><a href="#home">Home</a>
+	                    <li><a href="#locationEntry">Location</a></li>
+	                    <li><a href="#">GPS</a></li>
+	                </ul>
+	            </div><!-- end navbar -->
+	        </div><!-- end footer -->
+
+        </div><!-- end locationEntry page -->
     </body>
 </html>
