@@ -21,13 +21,15 @@
                 font-family: Arial Black;
                 text-decoration: underline !important;
             }
-            .weatherResult {
+            #weatherResult {
                 padding: 1em;
                 background-color: #ECECEC;
                 -webkit-border-radius: 20px;
                 -moz-border-radius: 20px;
                 border-radius: 20px;
+                display: none; /*Will display only when there is output*/
             }
+
             .resultOutput {
                 background-color: gold !important;
                 font-size: 1.3em;
@@ -43,30 +45,96 @@
                 //Get user entered city
                 var citySearch = document.getElementById("cityInput").value;
                     //DEBUG
-                    alert("citySearch: " + citySearch);
+                    //alert("citySearch: " + citySearch);
                     
                 //Get user chosen country REF: http://www.trottyzone.com/using-javascript-get-value-input-select/
                 var countrySelectInput = document.getElementById("countryInput");
                 var countryChosen = countrySelectInput.value;
                     //DEBUG
-                    alert("countryChosen: " + countryChosen);    
+                    //alert("countryChosen: " + countryChosen);    
 
                 //Get weather JSON and parse the weather report information
                 //Ref: http://www.jquerybyexample.net/2012/05/how-to-read-and-parse-json-using-jquery.html
-                var weatherAPI = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
+                 var weatherJSON = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
+                
+                     //START - JSON TEXT EXAMPLE
+                     //{  
+                     //    "coord":{  
+                     //        "lon":-88.99,
+                     //        "lat":40.51
+                     //    },
+                     //    "sys":{  
+                     //        "type":1,
+                     //        "id":953,
+                     //        "message":0.0109,
+                     //        "country":"US",
+                     //        "sunrise":1426680102,
+                     //        "sunset":1426723565
+                     //    },
+                     //    "weather":[  
+                     //        {  
+                     //            "id":800,
+                     //            "main":"Clear",
+                     //            "description":"sky is clear",
+                     //            "icon":"01d"
+                     //        }
+                     //    ],
+                     //    "base":"cmc stations",
+                     //    "main":{  
+                     //        "temp":280.35,
+                     //        "pressure":1026,
+                     //        "humidity":33,
+                     //        "temp_min":279.82,
+                     //        "temp_max":281.15
+                     //    },
+                     //    "wind":{  
+                     //        "speed":5.1,
+                     //        "deg":100
+                     //    },
+                     //    "clouds":{  
+                     //        "all":1
+                     //    },
+                     //    "dt":1426703094,
+                     //    "id":4903780,
+                     //    "name":"Normal",
+                     //    "cod":200
+                     //}
+                     //END - JSON TEXT EXAMPLE
+                
+                     //DEBUG
+				     //$.getJSON("https://graph.facebook.com/btaylor", function(person){
+                     //    $.each(person, function(key, value){
+				     //    	alert("facebook: "+key+": "+value)
+				     //    });
+				     //});
 
-                $.getJSON(weatherAPI, function (data) {
+                    //alert("weatherJSON: " + weatherJSON);
 
-                    $.each(data, function(key, value) {
-                        //DEBUG
-                        alert("dataJSON: " + key + " - " + value);
-                    });
+                $.getJSON(weatherJSON, function (data) {
+                    //DEBUG
+                    //alert("dataJSON data.coord.lon: " + data.coord.lon);
+                    //alert("temp : " + data.main.temp);
 
-                   
+                    //Get temperature and convert from Kelvin to Celcius
+                    var tempKelvinString = data.main.temp;
+                    var tempKelvinInt = parseInt(tempKelvinString);
+                    var tempCelciusInt = tempKelvinInt - 275.15;
 
+                    //Get icon code and get the url
+                    var iconURLCode = data.weather.icon;
+                    var iconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
+
+                    //Get longitude and latitude
+                    var long = data.coord.lon;
+                    var lat = data.coord.lat;
+
+                    //http://openweathermap.org/forecast
+                    //http://api.openweathermap.org/data/2.5/forecast/daily?lat=35&lon=139&cnt=5&mode=json
                 });
 
-                alert("EXIT SCRIPT");
+                
+                //alert("EXIT SCRIPT");
+                $("#weatherResult").fadeIn(900);
             }
         </script>
         
@@ -103,8 +171,8 @@
                 <p class="ui-btn ui-shadow ui-corner-all label">LOCATION</p>
                 <br/>
                 <label for="cityInput">City:</label>
-                <input type="text" name="cityInput" id="cityInput" value=""/>
-
+                <input type="text" name="cityInput" id="cityInput" value="normal"/>
+                <label>Remove Normal from INPUT</label>
                 <label for="countryInput">Country:</label>
                 <select name="countryInput" id="countryInput" data-native-menu="false">
                     <option selected="selected" value="US">USA</option>
@@ -127,14 +195,16 @@
                 <hr/>
                 <br/>
                 
-                <div class="weatherResult"><!-- Weather Result Output -->
+                <div id="weatherResult"><!-- start weatherResult -->
                     <p class="ui-btn ui-shadow ui-corner-all resultOutput">WEATHER REPORT</p>
+                    <div id="weatherResultTable"><!-- start weatherResultTable -->
 
-                    
 
 
-                </div>
-
+                    </div><!-- end weatherResultTable -->
+                </div><!-- end weatherResult -->
+                
+                
 
 
             </div><!-- end content -->
@@ -148,7 +218,9 @@
 	                </ul>
 	            </div><!-- end navbar -->
 	        </div><!-- end footer -->
-
         </div><!-- end locationEntry page -->
+
+
+    
     </body>
 </html>
