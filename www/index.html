@@ -42,13 +42,12 @@
         </style>
         <script>
             function weatherReport() { // triggered with 'Get Weather Report' button
-
                 //START - GET USER INPUT
                     //Get user entered city.
                     var citySearch = document.getElementById("cityInput").value;
                         //DEBUG
                         //alert("citySearch: " + citySearch);
-                    
+
                     //Get user chosen country. REF: http://www.trottyzone.com/using-javascript-get-value-input-select/
                     var countrySelectInput = document.getElementById("countryInput");
                     var countryChosen = countrySelectInput.value;
@@ -56,9 +55,12 @@
                         //alert("countryChosen: " + countryChosen);    
                 //END - GET USER INPUT
 
-                //START - GET DATES (Today and Five subsequent days)
+                //Store dates to display for current date and 5-day forecast weather report
+                var dateString, dateStringPlusOne, dateStringPlusTwo, dateStringPlusThree, dateStringPlusFour, dateStringPlusFive;
+                //Calculate today's date and subsequent 5 days (for current weather and 5 day forecast)
+                function calcDates() {//START - GET DATES (Today and Five subsequent days)
                     var currTime = new Date();
-                    var fixDateString = currTime.getFullYear() + "/" + (currTime.getMonth()+1) + "/" + currTime.getDate() + " 00:00:00";   //Set time to today's date but hours, min, seconds are zeroed.
+                    var fixDateString = currTime.getFullYear() + "/" + (currTime.getMonth()+1) + "/" + currTime.getDate() + " 00:00:00";   //Set time to today's date BUT HH:MM:SS are zeroed.
                     var currFixTime = new Date(fixDateString);
                     var currTimePlusOne = new Date(currFixTime.getTime() + 86400000);         //getTime return milliseconds between today & 1970. 86400000 milliseconds is one day. Today + 1 day
                     var currTimePlusTwo = new Date(currTimePlusOne.getTime() + 86400000);     //Today + 2 days
@@ -73,8 +75,7 @@
                         //"timePlusFour: " + currTimePlusFour + "\n" +
                         //"timePlusFive: " + currTimePlusFive);
 
-                    //Get weekday name function
-                    function getWeekdayName(weekNumber) {
+                    function getWeekdayName(weekNumber) { //Get weekday name function
                         switch (weekNumber) {
                             case 0:
                                 return "Sun";
@@ -96,7 +97,7 @@
                     }//End getWeekdayName function
 
                     //Store weekday name for today and 5 days ahead (for forecasting)
-                    var weekDayName = getWeekdayName(currTime.getDay());                    //Function parameter is weekday number. Today's Weekday Name
+                    var weekDayName = getWeekdayName(currTime.getDay());                    //Function parameter is weekday number. Gets today's Weekday Name
                     var weekDayNamePlusOne = getWeekdayName(currTimePlusOne.getDay());      //Today's Weekday Name + 1 day
                     var weekDayNamePlusTwo = getWeekdayName(currTimePlusTwo.getDay());      //Today's Weekday Name + 2 days
                     var weekDayNamePlusThree = getWeekdayName(currTimePlusThree.getDay());  //Today's Weekday Name + 3 days
@@ -172,72 +173,73 @@
                         //"dayPlusFour =" + dayPlusFour + "\n" +
                         //"dayPlusFive =" + dayPlusFive);
 
-                    var dateString = monthName + " " + day + " (" + weekDayName + ")";                                       //Formatted string date. Ex: Mar 19 (Thu)
-                    var dateStringPlusOne = monthNamePlusOne + " " + dayPlusOne + " (" + weekDayNamePlusOne + ")";
-                    var dateStringPlusTwo = monthNamePlusTwo + " " + dayPlusTwo + " (" + weekDayNamePlusTwo + ")";
-                    var dateStringPlusThree = monthNamePlusThree + " " + dayPlusThree + " (" + weekDayNamePlusThree + ")";
-                    var dateStringPlusFour = monthNamePlusFour + " " + dayPlusFour + " (" + weekDayNamePlusFour + ")";
-                    var dateStringPlusFive = monthNamePlusFive + " " + dayPlusFive + " (" + weekDayNamePlusFive + ")";
+                    dateString = monthName + " " + day + " (" + weekDayName + ")";     //Formatted string date. Ex: Mar 19 (Thu)
+                    dateStringPlusOne = monthNamePlusOne + " " + dayPlusOne + " (" + weekDayNamePlusOne + ")";
+                    dateStringPlusTwo = monthNamePlusTwo + " " + dayPlusTwo + " (" + weekDayNamePlusTwo + ")";
+                    dateStringPlusThree = monthNamePlusThree + " " + dayPlusThree + " (" + weekDayNamePlusThree + ")";
+                    dateStringPlusFour = monthNamePlusFour + " " + dayPlusFour + " (" + weekDayNamePlusFour + ")";
+                    dateStringPlusFive = monthNamePlusFive + " " + dayPlusFive + " (" + weekDayNamePlusFive + ")";
                         //DEBUG
-                        alert("dateString = " + dateString + "\n" +
-                        "dateStringPlusOne = " + dateStringPlusOne + "\n" +
-                        "dateStringPlusTwo = " + dateStringPlusTwo + "\n" +
-                        "dateStringPlusThree = " + dateStringPlusThree + "\n" +
-                        "dateStringPlusFour = " + dateStringPlusFour + "\n" +
-                        "dateStringPlusFive = " + dateStringPlusFive);
-                    
-                //END - GET DATES (Today and Five subsequent days)
+                        //alert("dateString = " + dateString + "\n" +
+                        //"dateStringPlusOne = " + dateStringPlusOne + "\n" +
+                        //"dateStringPlusTwo = " + dateStringPlusTwo + "\n" +
+                        //"dateStringPlusThree = " + dateStringPlusThree + "\n" +
+                        //"dateStringPlusFour = " + dateStringPlusFour + "\n" +
+                        //"dateStringPlusFive = " + dateStringPlusFive);
+                }//END - GET DATES (Today and Five subsequent days)
 
+                calcDates(); //calculates dates for current date and subseqent 5-days
 
-
-                //START - Get the CURRENT weather JSON and parse the weather report information
+                var currTempCelciusInt, currIconURL, currLong, currLat; //Store the CURRENT weather report
+                //Get current weather from third-party JSON API
+                function currentWeather() {
                     //Ref: http://www.jquerybyexample.net/2012/05/how-to-read-and-parse-json-using-jquery.html
-                     var currWeatherJSON = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
-                
-                         //START - JSON TEXT EXAMPLE
-                             //{  
-                             //    "coord":{  
-                             //        "lon":-88.99,
-                             //        "lat":40.51
-                             //    },
-                             //    "sys":{  
-                             //        "type":1,
-                             //        "id":953,
-                             //        "message":0.0109,
-                             //        "country":"US",
-                             //        "sunrise":1426680102,
-                             //        "sunset":1426723565
-                             //    },
-                             //    "weather":[  
-                             //        {  
-                             //            "id":800,
-                             //            "main":"Clear",
-                             //            "description":"sky is clear",
-                             //            "icon":"01d"
-                             //        }
-                             //    ],
-                             //    "base":"cmc stations",
-                             //    "main":{  
-                             //        "temp":280.35,
-                             //        "pressure":1026,
-                             //        "humidity":33,
-                             //        "temp_min":279.82,
-                             //        "temp_max":281.15
-                             //    },
-                             //    "wind":{  
-                             //        "speed":5.1,
-                             //        "deg":100
-                             //    },
-                             //    "clouds":{  
-                             //        "all":1
-                             //    },
-                             //    "dt":1426703094,
-                             //    "id":4903780,
-                             //    "name":"Normal",
-                             //    "cod":200
-                             //}
-                         //END - JSON TEXT EXAMPLE
-                
+                    var currWeatherJSON = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
+
+                             //START - JSON TEXT EXAMPLE
+                                 //{  
+                                 //    "coord":{  
+                                 //        "lon":-88.99,
+                                 //        "lat":40.51
+                                 //    },
+                                 //    "sys":{  
+                                 //        "type":1,
+                                 //        "id":953,
+                                 //        "message":0.0109,
+                                 //        "country":"US",
+                                 //        "sunrise":1426680102,
+                                 //        "sunset":1426723565
+                                 //    },
+                                 //    "weather":[  
+                                 //        {  
+                                 //            "id":800,
+                                 //            "main":"Clear",
+                                 //            "description":"sky is clear",
+                                 //            "icon":"01d"
+                                 //        }
+                                 //    ],
+                                 //    "base":"cmc stations",
+                                 //    "main":{  
+                                 //        "temp":280.35,
+                                 //        "pressure":1026,
+                                 //        "humidity":33,
+                                 //        "temp_min":279.82,
+                                 //        "temp_max":281.15
+                                 //    },
+                                 //    "wind":{  
+                                 //        "speed":5.1,
+                                 //        "deg":100
+                                 //    },
+                                 //    "clouds":{  
+                                 //        "all":1
+                                 //    },
+                                 //    "dt":1426703094,
+                                 //    "id":4903780,
+                                 //    "name":"Normal",
+                                 //    "cod":200
+                                 //}
+                             //END - JSON TEXT EXAMPLE
+
                          //DEBUG [Test if $.getJson works with other content]
 				         //$.getJSON("https://graph.facebook.com/btaylor", function(person){
                          //    $.each(person, function(key, value){
@@ -245,91 +247,99 @@
 				         //    });
 				         //});
                     
-                        //DEBUG
-                        //alert("currWeatherJSON: " + currWeatherJSON);
-
-                    //Store the CURRENT weather report
-                    var currTempCelciusInt;
-                    var currIconURL;
-                    var currLong;
-                    var currLat;
-
-                    //Parse the CURRENT weather report JSON
-                    $.getJSON(currWeatherJSON, function (data) {
+                    $.getJSON(currWeatherJSON, function (currentWeather) { //Parse CURRENT weather report JSON
                             //DEBUG
-                            //alert("dataJSON data.coord.lon: " + data.coord.lon);
-                            //alert("temp : " + data.main.temp);
+                            //alert("dataJSON currentWeather.coord.lon: " + currentWeather.coord.lon);
+                            //alert("temp : " + currentWeather.main.temp);
 
                         //Get temperature and convert from Kelvin to Celcius
-                        var tempKelvinString = data.main.temp;
+                        var tempKelvinString = currentWeather.main.temp;
                         var tempKelvinInt = parseInt(tempKelvinString);
                         currTempCelciusInt = tempKelvinInt - 275.15;
 
                         //Get icon code and append to url to retrieve weather icon 
-                        var iconURLCode = data.weather.icon;
+                        var iconURLCode = currentWeather.weather.icon;
                         currIconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
 
                         //Get longitude and latitude
-                        currLong = data.coord.lon;
-                        currLat = data.coord.lat;
+                        currLong = currentWeather.coord.lon;
+                        currLat = currentWeather.coord.lat;
                     });
-                //END - Get the CURRENT weather JSON and parse the weather report information
+                }//END currentWeather() function
+
+                currentWeather();   //get current weather report
+
+                //Store the 5 DAY WEATHER FORECAST report: temperature and icons
+                var tempCelciusFiveDaysForecast = [];
+                var iconURLFiveDaysForecast = [];
+
+                function forecastWeather() { //START - 5 DAY WEATHER FORECAST JSON and parse the weather report
+                    var forecastWeatherJSON = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + citySearch + "," + countryChosen + "&units=metric&cnt=6";
+
+                            //START - JSON TEXT EXAMPLE
+                            //{  
+                            //    "cod":"200",
+                            //    "message":0.0402,
+                            //    "city":{  
+                            //        "id":2643743,
+                            //        "name":"London",
+                            //        "coord":{  
+                            //            "lon":-0.12574,
+                            //            "lat":51.50853
+                            //        },
+                            //        "country":"GB",
+                            //        "population":0,
+                            //        "sys":{  
+                            //            "population":0
+                            //        }
+                            //    },
+                            //    "cnt":6,
+                            //    "list":[  
+                            //        {  
+                            //            "dt":1426852800,
+                            //            "temp":{  
+                            //                "day":9.26,
+                            //                "min":8.64,
+                            //                "max":9.26,
+                            //                "night":8.64,
+                            //                "eve":9.26,
+                            //                "morn":9.26
+                            //            },
+                            //            "pressure":1032.61,
+                            //            "humidity":85,
+                            //            "weather":[  
+                            //                {  
+                            //                    "id":500,
+                            //                    "main":"Rain",
+                            //                    "description":"light rain",
+                            //                    "icon":"10n"
+                            //                }
+                            //            ],
+                            //            "speed":3.47,
+                            //            "deg":302,
+                            //            "clouds":80
+                            //        },
+                            //END - JSON TEXT EXAMPLE
+
+                    //Parse the 5 Day weather forecast JSON
+                    $.getJSON(forecastWeatherJSON, function (forecast) {
+                            //console.log("forecast city name: " + forecast.city.name);
+                            //console.log("forecast city country: " + forecast.city.country);
+                        $.each(forecast.list, function (key, value) {
+                            tempCelciusFiveDaysForecast.push(value.temp.day);
+                                //console.log("each forecast forecast.list  [" + value.temp.day + "]");
+                            $.each(value.weather, function (key, value) {
+                                iconURLFiveDaysForecast.push("http://openweathermap.org/img/w/"+value.icon+".png");
+                                    //console.log("each forecast forecast.list.weather  [" + value.icon + "]");
+                            });//END $.each forecast.list.weather function
+                        });//END $.each forecast.list function
+                            //console.log("tempCelciusFiveDaysForecast: " + tempCelciusFiveDaysForecast);
+                            //console.log("iconURLFiveDaysForecast: " + iconURLFiveDaysForecast);
+                    });//END $.getJSON function
+                }//END - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
                 
-                //START - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
-                //NOTE: 5 DAY FORECAST only needs latitude and longtitude to retrieve weather info
-                    var forecastWeatherJSON = "http://api.openweathermap.org/data/2.5/forecast/daily?lat="+currLat+"&lon="+currLong+"&cnt=5&mode=json";
-
-                    //START - JSON TEXT EXAMPLE
-                        //{  
-                        //    "cod":"200",
-                        //    "message":0.0018,
-                        //    "city":{  
-                        //        "id":4885164,
-                        //        "name":"Bloomington",
-                        //        "coord":{  
-                        //            "lon":-88.99369,
-                        //            "lat":40.4842
-                        //        },
-                        //        "country":"US",
-                        //        "population":0
-                        //    },
-                        //    "cnt":5,
-                        //    "list":[  
-                        //        {  //START OF ONE DAY
-                        //            "dt":1426701600,
-                        //            "temp":{  
-                        //                "day":276.66,
-                        //                "min":274.66,
-                        //                "max":276.66,
-                        //                "night":274.66,
-                        //                "eve":276.66,
-                        //                "morn":276.66
-                        //            },
-                        //            "pressure":1010.43,
-                        //            "humidity":38,
-                        //            "weather":[  
-                        //                {  
-                        //                    "id":804,
-                        //                    "main":"Clouds",
-                        //                    "description":"overcast clouds",
-                        //                    "icon":"04n"
-                        //                }
-                        //            ],
-                        //            "speed":2.21,
-                        //            "deg":104,
-                        //            "clouds":92
-                        //        }, //END OF ONE DAY
-                    //END - JSON TEXT EXAMPLE
-
-                    //Store the 5 DAY WEATHER FORECAST report
-                    
-
-
-
-                //END - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
-                    
-                    //DEBUG
-                    //alert("EXIT SCRIPT");
+                forecastWeather(); //gets 5 day forecast weather report
+                    //console.log("EXIT SCRIPT");
                 $("#weatherResult").fadeIn(900);
             }
         </script>
@@ -351,7 +361,7 @@
 	            <div data-role="navbar">
 	                <ul>
 	                    <li><a href="#home">Home</a>
-	                    <li><a href="#locationEntry">Location</a></li>
+	                    <li><a href="#locationEntry">Search</a></li>
 	                    <li><a href="#">GPS</a></li>
 	                </ul>
 	            </div><!-- end navbar -->
@@ -407,7 +417,7 @@
 	            <div data-role="navbar">
 	                <ul>
 	                    <li><a href="#home">Home</a>
-	                    <li><a href="#locationEntry">Location</a></li>
+	                    <li><a href="#locationEntry">Search</a></li>
 	                    <li><a href="#">GPS</a></li>
 	                </ul>
 	            </div><!-- end navbar -->
