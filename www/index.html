@@ -39,6 +39,10 @@
             .submitButton {
                 background-color: lightskyblue !important;
             }
+
+            .divInline {
+                display: inline;
+            }
         </style>
         <script>
             function weatherReport() { // triggered with 'Get Weather Report' button
@@ -249,21 +253,32 @@
                     
                     $.getJSON(currWeatherJSON, function (currentWeather) { //Parse CURRENT weather report JSON
                             //DEBUG
-                            //alert("dataJSON currentWeather.coord.lon: " + currentWeather.coord.lon);
-                            //alert("temp : " + currentWeather.main.temp);
+                            console.log("dataJSON currentWeather.coord.lon: " + currentWeather.coord.lon);
+                            console.log("temp : " + currentWeather.main.temp);
 
                         //Get temperature and convert from Kelvin to Celcius
                         var tempKelvinString = currentWeather.main.temp;
                         var tempKelvinInt = parseInt(tempKelvinString);
-                        currTempCelciusInt = tempKelvinInt - 275.15;
+                        currTempCelciusRaw = tempKelvinInt - 275.15;
+                        currTempCelciusInt = currTempCelciusRaw.toFixed(2) + " &#8451;";
+
+                        document.getElementById("currTemp").innerHTML = currTempCelciusInt;
 
                         //Get icon code and append to url to retrieve weather icon 
-                        var iconURLCode = currentWeather.weather.icon;
-                        currIconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
+                        $.each(currentWeather.weather, function (key, value) {
+                            var iconURLCode = value.icon;
+                            currIconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
+                            console.log("iconURLCode: " + value.icon);
+                        });
+                            
+                        document.getElementById("currIcon").innerHTML = "<img src='" + currIconURL + "' alt='weather icon'/>";
 
                         //Get longitude and latitude
                         currLong = currentWeather.coord.lon;
                         currLat = currentWeather.coord.lat;
+
+                        document.getElementById("currLat").innerText = currLat.toFixed(2);
+                        document.getElementById("currLon").innerText = currLong.toFixed(2);
                     });
                 }//END currentWeather() function
 
@@ -321,8 +336,8 @@
                             //        },
                             //END - JSON TEXT EXAMPLE
 
-                    //Parse the 5 Day weather forecast JSON
-                    $.getJSON(forecastWeatherJSON, function (forecast) {
+                    
+                    $.getJSON(forecastWeatherJSON, function (forecast) {  //Parse 5 Day weather forecast JSON
                             //console.log("forecast city name: " + forecast.city.name);
                             //console.log("forecast city country: " + forecast.city.country);
                         $.each(forecast.list, function (key, value) {
@@ -340,6 +355,66 @@
                 
                 forecastWeather(); //gets 5 day forecast weather report
                     //console.log("EXIT SCRIPT");
+
+                //START - create table and populate with current and forecast weather
+
+                //var currentWeatherTable =
+                //+ "<table data-role='table' data-mode='reflow' class='ui-body-d ui-shadow table-stripe'>"
+                //    + "<thead>"
+                //        + "<tr>"
+                //            + "<th>Day</th>"
+                //            + "<th>Icon</th>"
+                //            + "<th>Celcius</th>"
+                //            + "<th>Latitude</th>"
+                //            + "<th>Longitude</th>"
+                //        + "</tr>"
+                //    + "</thead>"
+                //    + "<tbody>"
+                //        + "<tr>"
+                //            + "<th>" + dateString + "</th>"
+                //            + "<td><img src="+currIconURL+" alt='weather icon'></td>"
+                //            + "<td>" + currTempCelciusInt + "</td>"
+                //            + "<td>" + currLat + "</td>"
+                //            + "<td>" + currLong + "</td>"
+                //        + "</tr>"
+                //    + "</tbody>"
+                //+ "</table>";
+
+                //var currentWeatherTable =
+                //$("#currentWeatherResultTable").html(
+                //+ '<table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">'
+                //    + '<thead>'
+                //        + '<tr>'
+                //            + '<th>Day</th>'
+                //            + '<th>Icon</th>'
+                //            + '<th>Celcius</th>'
+                //            + '<th>Latitude</th>'
+                //            + '<th>Longitude</th>'
+                //        + '</tr>'
+                //    + '</thead>'
+                //    + '<tbody>'
+                //        + '<tr>'
+                //            + '<th>Cow</th>'
+                //            + '<td>Cow</td>'
+                //            + '<td>Cow</td>'
+                //            + '<td>Cow</td>'
+                //            + '<td>Cow</td>'
+                //        + '</tr>'
+                //    + '</tbody>'
+                //+ '</table>'
+                //);
+
+                document.getElementById("currDay").innerText = dateString;
+                
+                
+
+
+                //var getCurrentTable = document.getElementById("currentWeatherResultTable");
+                //getCurrentTable.innerHTML = currentWeatherTable;
+
+                //END - create table and populate with current and forecast weather
+
+
                 $("#weatherResult").fadeIn(900);
             }
         </script>
@@ -374,7 +449,7 @@
             </div><!-- end header -->
 
             <div data-role="content"><!-- start content -->
-                <p class="ui-btn ui-shadow ui-corner-all label">LOCATION</p>
+                <p class="ui-btn ui-shadow ui-corner-all label">SEARCH</p>
                 <br/>
                 <label for="cityInput">City:</label>
                 <input type="text" name="cityInput" id="cityInput" value="normal"/>
@@ -398,19 +473,41 @@
                 <a href="javascript:weatherReport()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Get Weather Report</a><!-- submit Button -->
                 
                 <br/>
-
+                
                 <div id="weatherResult"><!-- start weatherResult -->
-                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">WEATHER REPORT</p>
-                    <div id="weatherResultTable"><!-- start weatherResultTable -->
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT WEATHER</p>
+                    <div id="currentWeatherResultTable"><!-- start currentWeatherResultTable -->
+                        <table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th></th>
+                                <th>Celcius</th>
+                                <th>Latitude</th>
+                                <th>Longitude</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th><div class="divInline" id="currDay"></div></th>
+                                <td id="currIcon" style="text-align: center"></td>
+                                <td><div class="divInline" id="currTemp"></div></td>
+                                <td><div class="divInline" id="currLat"></div></td>
+                                <td><div class="divInline" id="currLon"></div></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    </div><!-- end currentWeatherResultTable -->
+                    
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">FORECAST WEATHER</p>
+                    <div id="forecastWeatherResultTable"><!-- start forecastWeatherResultTable -->
 
 
 
-                    </div><!-- end weatherResultTable -->
+
+                    </div><!-- end forecastWeatherResultTable -->
                 </div><!-- end weatherResult -->
-                
-                
-
-
             </div><!-- end content -->
 
             <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
@@ -423,8 +520,5 @@
 	            </div><!-- end navbar -->
 	        </div><!-- end footer -->
         </div><!-- end locationEntry page -->
-
-
-    
     </body>
 </html>
