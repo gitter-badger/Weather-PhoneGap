@@ -318,11 +318,11 @@
 
             currentWeather();   //get current weather report
 
-            //Store the 5 DAY WEATHER FORECAST report: temperature and icons
+            //Store the 6 DAY WEATHER FORECAST report: temperature and icons
             var tempCelciusFiveDaysForecast = [];
             var iconURLFiveDaysForecast = [];
 
-            function forecastWeather() { //START - 5 DAY WEATHER FORECAST JSON and parse the weather report
+            function forecastWeather() { //START - 6 DAY WEATHER FORECAST JSON and parse the weather report (NOTE first day of forecast is ignored since that would be current weather)
                 var forecastWeatherJSON = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + citySearch + "," + countryChosen + "&units=metric&cnt=6";
 
                 //START - JSON TEXT EXAMPLE
@@ -370,11 +370,11 @@
                 //        },
                 //END - JSON TEXT EXAMPLE
                     
-                $.getJSON(forecastWeatherJSON, function (forecast) {  //Parse 5 Day weather forecast JSON
+                $.getJSON(forecastWeatherJSON, function (forecast) {  //Parse 6 Day weather forecast JSON
                     //console.log("forecast city name: " + forecast.city.name);
                     //console.log("forecast city country: " + forecast.city.country);
                     $.each(forecast.list, function (key, value) {
-                        tempCelciusFiveForecastRaw = value.temp.day;								                        	
+                        var tempCelciusFiveForecastRaw = value.temp.day;								                        	
                         tempCelciusFiveDaysForecast.push(tempCelciusFiveForecastRaw.toFixed(2) + " &#8451;");	//Celcius symbol
                             //console.log("each forecast forecast.list  [" + value.temp.day + "]");
                         $.each(value.weather, function (key, value) {
@@ -400,19 +400,19 @@
                     document.getElementById("iconPlusFive").innerHTML = "<img src='"+iconURLFiveDaysForecast[5]+"' alt='weather icon'/>";
                     document.getElementById("tempPlusFive").innerHTML = tempCelciusFiveDaysForecast[5];
                 });//END $.getJSON function
-            }//END - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
+            }//END - Get the 6 DAY WEATHER FORECAST JSON and parse the weather report information
                 
-            forecastWeather(); //gets 5 day forecast weather report
+            forecastWeather(); //gets 6 day forecast weather report
             //console.log("EXIT SCRIPT");               
             
             window.setTimeout(function () { $(".loading").hide(); }, 4999 );            //Hide loading gif after 4.9 sec
-            window.setTimeout(function () { $("#weatherResult").fadeIn(5000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
-        }	// END - weatherReportByLocation() function
+            window.setTimeout(function () { $("#weatherResult").fadeIn(3000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
+        }// END - weatherReportByLocation() function
+
 
         function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
-
             $("#weatherResultGPS").hide(); //hide table (if user re-enters new data and table has been displayed)
-            $(".loading").show();       //shows loading gif
+            $(".loading").show();          //shows loading gif
 
             var dateStringArrGPS = calcDates();
             //Add to page, current day's DATE, day + 1 Date, day + 2 Date, day + 3 Date. day + 4 Date, day + 5 Date
@@ -422,43 +422,41 @@
             document.getElementById("dayPlusThreeGPS").innerText = dateStringArrGPS[3];
             document.getElementById("dayPlusFourGPS").innerText = dateStringArrGPS[4];
             document.getElementById("dayPlusFiveGPS").innerText = dateStringArrGPS[5];
-
-
+            
             function onSuccess(position) {
-
-            	//DEBUG
-                 var msg = 'Latitude: '          + position.coords.latitude + '\n' +
-                           'Longitude: '         + position.coords.longitude + '\n' +
-                           'Altitude: '          + position.coords.altitude + '\n' +
-                           'Accuracy: '          + position.coords.accuracy + '\n' +
-                           'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
-                           'Heading: '           + position.coords.heading + '\n' +
-                           'Speed: '             + position.coords.speed + '\n' +
-                           'Timestamp: '         + position.timestamp + '\n';
+            	    //DEBUG
+                     //var msg = 'Latitude: '          + position.coords.latitude + '\n' +
+                     //          'Longitude: '         + position.coords.longitude + '\n' +
+                     //          'Altitude: '          + position.coords.altitude + '\n' +
+                     //          'Accuracy: '          + position.coords.accuracy + '\n' +
+                     //          'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
+                     //          'Heading: '           + position.coords.heading + '\n' +
+                     //          'Speed: '             + position.coords.speed + '\n' +
+                     //          'Timestamp: '         + position.timestamp + '\n';
                 
-                // function navAlertPass() {
-                //     function alertDismissedPass() {}
-                //     navigator.notification.alert("GPS Works\n"+msg, alertDismissedPass, "GPS", "OK");
-                // }
-                // navAlertPass();
+                    // function navAlertPass() {
+                    //     function alertDismissedPass() {}
+                    //     navigator.notification.alert("GPS Works\n"+msg, alertDismissedPass, "GPS", "OK");
+                    // }
+                    // navAlertPass();
 
-                alert(msg);
+                    //alert(msg);
 
-                var currWeatherGpsJson = "http://api.openweathermap.org/data/2.5/weather?lat=" + position.coords.latitude + "&lon=" + position.coords.longitude + "&units=metric";
+                //START - Retrieve CURRENT WEATHER via GPS from API
+                    var currWeatherGpsJson = "http://api.openweathermap.org/data/2.5/weather?lat=" + position.coords.latitude + "&lon=" + position.coords.longitude + "&units=metric";
 
-                $.getJSON(currWeatherGpsJson, function(currentWeatherGPS) {
-                    var tempCelciusGPSRaw = currentWeatherGPS.main.temp;
-                    var tempCelciusGPS = tempCelciusGPSRaw.toFixed(2) + " &#8451;";
+                    $.getJSON(currWeatherGpsJson, function(currentWeatherGPS) {
+                        var tempCelciusGPSRaw = currentWeatherGPS.main.temp;
+                        var tempCelciusGPS = tempCelciusGPSRaw.toFixed(2) + " &#8451;";
+                        document.getElementById("currTempGPS").innerHTML = tempCelciusGPS;
 
-                    document.getElementById("currTempGPS").innerHTML = tempCelciusGPS;
-
-                    //Get icon code and append to url to retrieve weather icon 
-                    $.each(currentWeatherGPS.weather, function (key, value) {
-                        var iconURLCodeGPS = value.icon;
-                        currIconURLGPS = "http://openweathermap.org/img/w/" + iconURLCodeGPS + ".png";
-                        //console.log("iconURLCodeGPS: " + value.icon);
-                    });
-                    //Insert current weather image icon to page
+                        //Get icon code and append to url to retrieve weather icon 
+                        $.each(currentWeatherGPS.weather, function (key, value) {
+                            var iconURLCodeGPS = value.icon;
+                            currIconURLGPS = "http://openweathermap.org/img/w/" + iconURLCodeGPS + ".png";
+                            //console.log("iconURLCodeGPS: " + value.icon);
+                        });
+                        //Insert current weather image icon to page
                     document.getElementById("currIconGPS").innerHTML = "<img src='" + currIconURLGPS + "' alt='weather icon'/>";
 
                     //Get longitude and latitude
@@ -467,22 +465,61 @@
                     //Add to page, current day longtitude and latitude
                     document.getElementById("currLatGPS").innerText = currLatGPS.toFixed(2);
                     document.getElementById("currLonGPS").innerText = currLonGPS.toFixed(2);
-                });
+                //END - Retrieve CURRENT WEATHER via GPS from API
 
-                window.setTimeout(function () { $(".loading").hide(); }, 4999);                //Hide loading gif after 4.9 sec
-                window.setTimeout(function () { $("#weatherResultGPS").fadeIn(5000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
-        }
+                //START - Retrieve FORECAST WEATHER (for 6 days) via GPS from API (NOTE first day of forecast is ignored since that would be current weather)
+                    //Store the 6 DAY WEATHER FORECAST report: temperature and icons
+                    var tempCelciusFiveDaysForecastGPS = [];
+                    var iconURLFiveDaysForecastGPS = [];
+
+                    var forecastWeatherGpsJson = "http://api.openweathermap.org/data/2.5/forecast/daily?lat=" + position.coords.latitude + "&lon=" + position.coords.longitude + "&cnt=6&mode=json&units=metric";
+
+                    $.getJSON(forecastWeatherGpsJson, function (forecastGPS) {  //Parse 6 Day weather forecast JSON
+                        //console.log("forecast city name: " + forecastGPS.city.name);
+                        //console.log("forecast city country: " + forecastGPS.city.country);
+                        $.each(forecastGPS.list, function (key, value) {
+                            var tempCelciusFiveForecastGPSRaw = value.temp.day;
+                            tempCelciusFiveDaysForecastGPS.push(tempCelciusFiveForecastGPSRaw.toFixed(2) + " &#8451;");	//Celcius symbol
+                            //console.log("each forecast forecastGPS.list  [" + value.temp.day + "]");
+                            $.each(value.weather, function (key, value) {
+                                iconURLFiveDaysForecastGPS.push("http://openweathermap.org/img/w/" + value.icon + ".png");
+                                //console.log("each forecast forecastGPS.list.weather  [" + value.icon + "]");
+                            });//END $.each forecastGPS.list.weather function
+                        });//END $.each forecastGPS.list function
+                        //console.log("tempCelciusFiveDaysForecast: " + tempCelciusFiveDaysForecast);
+                        //console.log("iconURLFiveDaysForecast: " + iconURLFiveDaysForecast);
+                        //Add to page, Current Day + One [Icon and Temperature]
+                        document.getElementById("iconPlusOneGPS").innerHTML = "<img src='" + iconURLFiveDaysForecastGPS[1] + "' alt='weather icon'/>";
+                        document.getElementById("tempPlusOneGPS").innerHTML = tempCelciusFiveDaysForecastGPS[1];
+                        //Add to page, Current Day + Two [Icon and Temperature]
+                        document.getElementById("iconPlusTwoGPS").innerHTML = "<img src='" + iconURLFiveDaysForecastGPS[2] + "' alt='weather icon'/>";
+                        document.getElementById("tempPlusTwoGPS").innerHTML = tempCelciusFiveDaysForecastGPS[2];
+                        //Add to page, Current Day + Three [Icon and Temperature]
+                        document.getElementById("iconPlusThreeGPS").innerHTML = "<img src='" + iconURLFiveDaysForecastGPS[3] + "' alt='weather icon'/>";
+                        document.getElementById("tempPlusThreeGPS").innerHTML = tempCelciusFiveDaysForecastGPS[3];
+                        //Add to page, Current Day + Four [Icon and Temperature]
+                        document.getElementById("iconPlusFourGPS").innerHTML = "<img src='" + iconURLFiveDaysForecastGPS[4] + "' alt='weather icon'/>";
+                        document.getElementById("tempPlusFourGPS").innerHTML = tempCelciusFiveDaysForecastGPS[4];
+                        //Add to page, Current Day + Five [Icon and Temperature]
+                        document.getElementById("iconPlusFiveGPS").innerHTML = "<img src='" + iconURLFiveDaysForecastGPS[5] + "' alt='weather icon'/>";
+                        document.getElementById("tempPlusFiveGPS").innerHTML = tempCelciusFiveDaysForecastGPS[5];
+                    });//END $.getJSON function
+                //END - Retrieve FORECAST WEATHER (for 6 days) via GPS from API
+
+                    window.setTimeout(function () { $(".loading").hide(); }, 4999);                //Hide loading gif after 4.9 sec
+                    window.setTimeout(function () { $("#weatherResultGPS").fadeIn(3000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
+                });
+            }
 
             function onFailure(error) {
                 function navAlertFail() {
+                    window.setTimeout(function () { $(".loading").hide(); }, 4999);                //Hide loading gif after 4.9 sec
                     function alertDismissedFail() {}
-                    navigator.notification.alert("Error Code: " + error.code + "\nError Message: " + error.message, alertDismissedFail, "GPS", "OK");
+                    navigator.notification.alert("Error Code: " + error.code + "\nError Message: " + error.message, alertDismissedFail, "GPS Error", "OK");
                 }
                 navAlertFail();
             }
-
-            navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
-
+            navigator.geolocation.getCurrentPosition(onSuccess, onFailure);     //Geolocation plugin, if coordinates retrieves -> onSuccess, if fail -> onFailure
         }	// END - weatherReportByGPS() function
     </script>
     </head>
@@ -522,8 +559,7 @@
                 <p class="ui-btn ui-shadow ui-corner-all label">SEARCH</p>
                 <br/>
                 <label for="cityInput">City:</label>
-                <input type="text" name="cityInput" id="cityInput" value="normal"/>
-                <label>Remove Normal from INPUT</label>
+                <input type="text" name="cityInput" id="cityInput" value="" placeholder="Enter city name"/>
                 <label for="countryInput">Country:</label>
                 <select name="countryInput" id="countryInput" data-native-menu="false">
                     <option selected="selected" value="US">USA</option>
