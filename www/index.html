@@ -426,11 +426,23 @@
                 //var timestamp = d.toLocaleString();
                 //console.log("GPS success");
                 
-                navigator.notification.alert("GPS works", alertDismissed, "GPS", "OK");
+
+                function test() {
+                    navigator.notification.alert("GPS works", alertDismissed, "GPS", "OK");
+                }
+
+                test();
             }
 
             function onFailure() {
-                navigator.notification.alert("GPS doesnt work", alertDismissed, "GPS", "OK");
+
+                function test1() {
+                    navigator.notification.alert("GPS doesnt work", alertDismissed, "GPS", "OK");
+                }
+
+                test1();
+
+                
                 //console.log("GPS failure");
             }
 
