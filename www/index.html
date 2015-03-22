@@ -407,78 +407,42 @@
             window.setTimeout(function () { $("#weatherResult").fadeIn(5000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
         }	// END - weatherReportByLocation() function
 
-
-
         function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
 
-            
+            function onSuccess(position) {
 
-            //function showAlert() {
-            //    navigator.notification.alert("nav notification works!", alertDismissed, "Game Over", "Done");
-            //}
-
-            //showAlert();
-
-            function onSuccess() {
-                //var d = new Date(res.timestamp);
-                //var timestamp = d.toLocaleString();
-                //console.log("GPS success");
-                
-
-                function test() {
-
-                    function alertDismissed() {
-                        //lala
-                    }
+                var msg = 'Latitude: '          + position.coords.latitude + '\n' +
+                          'Longitude: '         + position.coords.longitude + '\n' +
+                          'Altitude: '          + position.coords.altitude + '\n' +
+                          'Accuracy: '          + position.coords.accuracy + '\n' +
+                          'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
+                          'Heading: '           + position.coords.heading + '\n' +
+                          'Speed: '             + position.coords.speed + '\n' +
+                          'Timestamp: '         + position.timestamp + '\n';
 
 
 
-                    navigator.notification.alert("GPS works", alertDismissed, "GPS", "OK");
+                //DEBUG
+                function navAlertPass() {
+                    function alertDismissedPass() {}
+                    navigator.notification.alert("GPS works\n"+msg, alertDismissedPass, "GPS", "OK");
                 }
+                navAlertPass();
 
-                test();
+
+
+
             }
 
-            function onFailure() {
-
-                function test1() {
-
-
-                    function alertDismissed() {
-                        //lala
-                    }
-
-                    navigator.notification.alert("GPS doesnt work", alertDismissed, "GPS", "OK");
+            function onFailure(error) {
+                function navAlertFail() {
+                    function alertDismissedFail() {}
+                    navigator.notification.alert("Error Code: " + error.code + "\nError Message: " + error.message, alertDismissedFail, "GPS", "OK");
                 }
-
-                test1();
-
-                
-                //console.log("GPS failure");
+                navAlertFail();
             }
 
             navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
-
-
-            //function currPosition() {
-
-            //    if (navigator.geolocation) {
-
-            //        function onSuccess(res) {
-            //            var d = new Date(res.timestamp);
-            //            var timestamp = d.toLocaleString();
-            //            console.log("GPS timestamp: " + timestamp);
-            //        }
-
-            //        function onFailure() {
-            //            console.log("GPS failure");
-            //        }
-
-            //        navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
-            //    }
-            //}
-
-            //currPosition();
 
         }	// END - weatherReportByGPS() function
     </script>
