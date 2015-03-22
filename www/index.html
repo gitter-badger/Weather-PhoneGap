@@ -30,12 +30,22 @@
                 display: none; /*display only when there is weather report*/
             }
 
+            #weatherResultGPS {
+                padding: 1em;
+                background-color: #ECECEC;
+                -webkit-border-radius: 20px;
+                -moz-border-radius: 20px;
+                border-radius: 20px;
+                display: none; /*display only when there is weather report*/
+            }
+
             .resultOutput {
                 background-color: gold !important;
                 font-size: 1.3em;
                 font-family: Arial Black;
                 text-decoration: underline !important;
             }
+
             .submitButton {
                 background-color: lightskyblue !important;
             }
@@ -44,17 +54,9 @@
                 display: inline;
             }
 
-            /*.loadingGIF {
-                display: block;
-                background: url("./css/images/ajax-loader.gif");
-                text-align: center;
-            }*/
-
-            #loading {
+            .loading {
                 display: none;
             }
-
-
         </style>
     <script>
         
@@ -202,7 +204,7 @@
         function weatherReportByLocation() { // triggered with 'Get Weather Report' button on SEARCH page
 
             $("#weatherResult").hide(); //hide table (if user re-enters new data and table has been displayed)
-            $("#loading").show();       //shows loading gif
+            $(".loading").show();       //shows loading gif
             
             //START - GET USER INPUT
                 //Get user entered city.
@@ -293,7 +295,7 @@
                     var tempKelvinInt = parseInt(tempKelvinString);
                     currTempCelciusRaw = tempKelvinInt - 275.15;
                     currTempCelciusInt = currTempCelciusRaw.toFixed(2) + " &#8451;";
-
+                    //Insert current weather (by search) to page
                     document.getElementById("currTemp").innerHTML = currTempCelciusInt;
 
                     //Get icon code and append to url to retrieve weather icon 
@@ -302,7 +304,7 @@
                         currIconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
                         //console.log("iconURLCode: " + value.icon);
                     });
-                            
+                    //Insert current weather image icon to page
                     document.getElementById("currIcon").innerHTML = "<img src='" + currIconURL + "' alt='weather icon'/>";
 
                     //Get longitude and latitude
@@ -403,36 +405,73 @@
             forecastWeather(); //gets 5 day forecast weather report
             //console.log("EXIT SCRIPT");               
             
-            window.setTimeout(function () { $("#loading").hide(); }, 4999 );            //Hide loading gif after 4.9 sec
+            window.setTimeout(function () { $(".loading").hide(); }, 4999 );            //Hide loading gif after 4.9 sec
             window.setTimeout(function () { $("#weatherResult").fadeIn(5000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
         }	// END - weatherReportByLocation() function
 
         function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
 
+            $("#weatherResultGPS").hide(); //hide table (if user re-enters new data and table has been displayed)
+            $(".loading").show();       //shows loading gif
+
+            var dateStringArrGPS = calcDates();
+            //Add to page, current day's DATE, day + 1 Date, day + 2 Date, day + 3 Date. day + 4 Date, day + 5 Date
+            document.getElementById("currDayGPS").innerText = dateStringArrGPS[0];
+            document.getElementById("dayPlusOneGPS").innerText = dateStringArrGPS[1];
+            document.getElementById("dayPlusTwoGPS").innerText = dateStringArrGPS[2];
+            document.getElementById("dayPlusThreeGPS").innerText = dateStringArrGPS[3];
+            document.getElementById("dayPlusFourGPS").innerText = dateStringArrGPS[4];
+            document.getElementById("dayPlusFiveGPS").innerText = dateStringArrGPS[5];
+
+
             function onSuccess(position) {
 
-                var msg = 'Latitude: '          + position.coords.latitude + '\n' +
-                          'Longitude: '         + position.coords.longitude + '\n' +
-                          'Altitude: '          + position.coords.altitude + '\n' +
-                          'Accuracy: '          + position.coords.accuracy + '\n' +
-                          'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
-                          'Heading: '           + position.coords.heading + '\n' +
-                          'Speed: '             + position.coords.speed + '\n' +
-                          'Timestamp: '         + position.timestamp + '\n';
+            	//DEBUG
+                 var msg = 'Latitude: '          + position.coords.latitude + '\n' +
+                           'Longitude: '         + position.coords.longitude + '\n' +
+                           'Altitude: '          + position.coords.altitude + '\n' +
+                           'Accuracy: '          + position.coords.accuracy + '\n' +
+                           'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '\n' +
+                           'Heading: '           + position.coords.heading + '\n' +
+                           'Speed: '             + position.coords.speed + '\n' +
+                           'Timestamp: '         + position.timestamp + '\n';
+                
+                // function navAlertPass() {
+                //     function alertDismissedPass() {}
+                //     navigator.notification.alert("GPS Works\n"+msg, alertDismissedPass, "GPS", "OK");
+                // }
+                // navAlertPass();
 
+                alert(msg);
 
+                var currWeatherGpsJson = "http://api.openweathermap.org/data/2.5/weather?lat=" + position.coords.latitude + "&lon=" + position.coords.longitude + "&units=metric";
 
-                //DEBUG
-                function navAlertPass() {
-                    function alertDismissedPass() {}
-                    navigator.notification.alert("GPS works1\n"+msg, alertDismissedPass, "GPS1", "OK1");
-                }
-                navAlertPass();
+                $.getJSON(currWeatherGpsJson, function(currentWeatherGPS) {
+                    var tempCelciusGPSRaw = currentWeatherGPS.main.temp;
+                    var tempCelciusGPS = tempCelciusGPSRaw.toFixed(2) + " &#8451;";
 
+                    document.getElementById("currTempGPS").innerHTML = tempCelciusGPS;
 
+                    //Get icon code and append to url to retrieve weather icon 
+                    $.each(currentWeatherGPS.weather, function (key, value) {
+                        var iconURLCodeGPS = value.icon;
+                        currIconURLGPS = "http://openweathermap.org/img/w/" + iconURLCodeGPS + ".png";
+                        //console.log("iconURLCodeGPS: " + value.icon);
+                    });
+                    //Insert current weather image icon to page
+                    document.getElementById("currIconGPS").innerHTML = "<img src='" + currIconURLGPS + "' alt='weather icon'/>";
 
+                    //Get longitude and latitude
+                    currLonGPS = currentWeatherGPS.coord.lon;
+                    currLatGPS = currentWeatherGPS.coord.lat;
+                    //Add to page, current day longtitude and latitude
+                    document.getElementById("currLatGPS").innerText = currLatGPS.toFixed(2);
+                    document.getElementById("currLonGPS").innerText = currLonGPS.toFixed(2);
+                });
 
-            }
+                window.setTimeout(function () { $(".loading").hide(); }, 4999);                //Hide loading gif after 4.9 sec
+                window.setTimeout(function () { $("#weatherResultGPS").fadeIn(5000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
+        }
 
             function onFailure(error) {
                 function navAlertFail() {
@@ -505,7 +544,7 @@
                 
                 <br/>
 
-                <div id="loading" style="text-align:center"><img src="css/images/ajax-loader.gif" alt="loading"/></div>
+                <div class="loading" style="text-align:center"><img src="css/images/ajax-loader.gif" alt="loading"/></div>
 
                 <div id="weatherResult"><!-- start weatherResult -->
                     <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT</p>
@@ -595,29 +634,13 @@
             <div data-role="content"><!-- start content -->
                 <p class="ui-btn ui-shadow ui-corner-all label">GPS</p>
                 <br/>
-                <!-- <label for="cityInput">City:</label>
-                <input type="text" name="cityInput" id="cityInput" value="normal"/>
-                <label>Remove Normal from INPUT</label>
-                <label for="countryInput">Country:</label>
-                <select name="countryInput" id="countryInput" data-native-menu="false">
-                    <option selected="selected" value="US">USA</option>
-                    <option value="MY">Malaysia</option>
-                    <option value="CA">Canada</option>
-                    <option value="GB">UK</option>
-                    <option value="DE">Germany</option>
-                    <option value="FR">France</option>
-                    <option value="RU">Russia</option>
-                    <option value="SG">Singapore</option>
-                    <option value="IN">India</option>
-                    <option value="CN">China</option>
-                    <option value="JP">Japan</option>
-                    <option value="IT">Italy</option>
-                </select> -->
+                
                 <br/>
                 <a href="javascript:weatherReportByGPS()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Weather</a><!-- submit Button -->
                 
                 <br/>
-                
+                <div class="loading" style="text-align:center"><img src="css/images/ajax-loader.gif" alt="loading"/></div>
+
                 <div id="weatherResultGPS"><!-- start weatherResultGPS -->
                     <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT</p>
                     <div id="currentWeatherResultTableGPS"><!-- start currentWeatherResultTableGPS -->
