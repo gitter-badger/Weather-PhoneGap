@@ -27,7 +27,7 @@
                 -webkit-border-radius: 20px;
                 -moz-border-radius: 20px;
                 border-radius: 20px;
-                display: none; /*Will display only when there is weather report*/
+                display: none; /*display only when there is weather report*/
             }
 
             .resultOutput {
@@ -43,352 +43,409 @@
             .divInline {
                 display: inline;
             }
+
+            /*.loadingGIF {
+                display: block;
+                background: url("./css/images/ajax-loader.gif");
+                text-align: center;
+            }*/
+
+            #loading {
+                display: none;
+            }
+
+
         </style>
-        <script>
-            function weatherReportByLocation() { // triggered with 'Get Weather Report' button on SEARCH page
-                //START - GET USER INPUT
-                    //Get user entered city.
-                    var citySearch = document.getElementById("cityInput").value;
-                        //DEBUG
-                        //alert("citySearch: " + citySearch);
+    <script>
+        
+        function calcDates() {//START - GET DATES (Today and Five subsequent days)
+            var currTime = new Date();
+            var fixDateString = currTime.getFullYear() + "/" + (currTime.getMonth() + 1) + "/" + currTime.getDate() + " 00:00:00";   //Set time to today's date BUT HH:MM:SS are zeroed.
+            var currFixTime = new Date(fixDateString);
+            var currTimePlusOne = new Date(currFixTime.getTime() + 86400000);         //getTime return milliseconds between today & 1970. 86400000 milliseconds is one day. Today + 1 day
+            var currTimePlusTwo = new Date(currTimePlusOne.getTime() + 86400000);     //Today + 2 days
+            var currTimePlusThree = new Date(currTimePlusTwo.getTime() + 86400000);   //Today + 3 days
+            var currTimePlusFour = new Date(currTimePlusThree.getTime() + 86400000);  //Today + 4 days
+            var currTimePlusFive = new Date(currTimePlusFour.getTime() + 86400000);   //Today + 5 days
+                //DEBUG
+                //alert("currFixTime: " + currFixTime + "\n" +
+                //"timePlusOne: " + currTimePlusOne + "\n" +
+                //"timePlusTwo: " + currTimePlusTwo + "\n" +
+                //"timePlusThree: " + currTimePlusThree + "\n" +
+                //"timePlusFour: " + currTimePlusFour + "\n" +
+                //"timePlusFive: " + currTimePlusFive);
 
-                    //Get user chosen country. REF: http://www.trottyzone.com/using-javascript-get-value-input-select/
-                    var countrySelectInput = document.getElementById("countryInput");
-                    var countryChosen = countrySelectInput.value;
-                        //DEBUG
-                        //alert("countryChosen: " + countryChosen);    
-                //END - GET USER INPUT
+            function getWeekdayName(weekNumber) { //Get weekday name function
+                switch (weekNumber) {
+                    case 0:
+                        return "Sun";
+                    case 1:
+                        return "Mon";
+                    case 2:
+                        return "Tue";
+                    case 3:
+                        return "Wed";
+                    case 4:
+                        return "Thu";
+                    case 5:
+                        return "Fri";
+                    case 6:
+                        return "Sat";
+                    default:
+                        return "Err";
+                }//End Case
+            }//End getWeekdayName function
 
-                //Store dates to display for current date and 5-day forecast weather report
-                var dateString, dateStringPlusOne, dateStringPlusTwo, dateStringPlusThree, dateStringPlusFour, dateStringPlusFive;
-                //Calculate today's date and subsequent 5 days (for current weather and 5 day forecast)
-                function calcDates() {//START - GET DATES (Today and Five subsequent days)
-                    var currTime = new Date();
-                    var fixDateString = currTime.getFullYear() + "/" + (currTime.getMonth()+1) + "/" + currTime.getDate() + " 00:00:00";   //Set time to today's date BUT HH:MM:SS are zeroed.
-                    var currFixTime = new Date(fixDateString);
-                    var currTimePlusOne = new Date(currFixTime.getTime() + 86400000);         //getTime return milliseconds between today & 1970. 86400000 milliseconds is one day. Today + 1 day
-                    var currTimePlusTwo = new Date(currTimePlusOne.getTime() + 86400000);     //Today + 2 days
-                    var currTimePlusThree = new Date(currTimePlusTwo.getTime() + 86400000);   //Today + 3 days
-                    var currTimePlusFour = new Date(currTimePlusThree.getTime() + 86400000);  //Today + 4 days
-                    var currTimePlusFive = new Date(currTimePlusFour.getTime() + 86400000);   //Today + 5 days
-                        //DEBUG
-                        //alert("currFixTime: " + currFixTime + "\n" +
-                        //"timePlusOne: " + currTimePlusOne + "\n" +
-                        //"timePlusTwo: " + currTimePlusTwo + "\n" +
-                        //"timePlusThree: " + currTimePlusThree + "\n" +
-                        //"timePlusFour: " + currTimePlusFour + "\n" +
-                        //"timePlusFive: " + currTimePlusFive);
+            //Store weekday name for today and 5 days ahead (for forecasting)
+            var weekDayName = getWeekdayName(currTime.getDay());                    //Function parameter is weekday number. Gets today's Weekday Name
+            var weekDayNamePlusOne = getWeekdayName(currTimePlusOne.getDay());      //Today's Weekday Name + 1 day
+            var weekDayNamePlusTwo = getWeekdayName(currTimePlusTwo.getDay());      //Today's Weekday Name + 2 days
+            var weekDayNamePlusThree = getWeekdayName(currTimePlusThree.getDay());  //Today's Weekday Name + 3 days
+            var weekDayNamePlusFour = getWeekdayName(currTimePlusFour.getDay());    //Today's Weekday Name + 4 days
+            var weekDayNamePlusFive = getWeekdayName(currTimePlusFive.getDay());    //Today's Weekday Name + 5 days
+                //DEBUG
+                //alert("weekDayName: " + weekDayName + "\n" +
+                //"weekDayNamePlusOne: " + weekDayNamePlusOne + "\n" +
+                //"weekDayNamePlusTwo: " + weekDayNamePlusTwo + "\n" +
+                //"weekDayNamePlusThree: " + weekDayNamePlusThree + "\n" +
+                //"weekDayNamePlusFour: " + weekDayNamePlusFour + "\n" +
+                //"weekDayNamePlusFive: " + weekDayNamePlusFive);
 
-                    function getWeekdayName(weekNumber) { //Get weekday name function
-                        switch (weekNumber) {
-                            case 0:
-                                return "Sun";
-                            case 1:
-                                return "Mon";
-                            case 2:
-                                return "Tue";
-                            case 3:
-                                return "Wed";
-                            case 4:
-                                return "Thu";
-                            case 5:
-                                return "Fri";
-                            case 6:
-                                return "Sat";
-                            default:
-                                return "Err";
-                        }//End Case
-                    }//End getWeekdayName function
+            //Get month name function
+            function getMonthName(monthNumber) {
+                switch (monthNumber) {
+                    case 0:
+                        return "Jan";
+                    case 1:
+                        return "Feb";
+                    case 2:
+                        return "Mar";
+                    case 3:
+                        return "Apr";
+                    case 4:
+                        return "May";
+                    case 5:
+                        return "Jun";
+                    case 6:
+                        return "Jul";
+                    case 7:
+                        return "Aug";
+                    case 8:
+                        return "Sep";
+                    case 9:
+                        return "Oct";
+                    case 10:
+                        return "Nov";
+                    case 11:
+                        return "Dec";
+                    default:
+                        return "Err";
+                }//End case
+            }//End getMonthName function
 
-                    //Store weekday name for today and 5 days ahead (for forecasting)
-                    var weekDayName = getWeekdayName(currTime.getDay());                    //Function parameter is weekday number. Gets today's Weekday Name
-                    var weekDayNamePlusOne = getWeekdayName(currTimePlusOne.getDay());      //Today's Weekday Name + 1 day
-                    var weekDayNamePlusTwo = getWeekdayName(currTimePlusTwo.getDay());      //Today's Weekday Name + 2 days
-                    var weekDayNamePlusThree = getWeekdayName(currTimePlusThree.getDay());  //Today's Weekday Name + 3 days
-                    var weekDayNamePlusFour = getWeekdayName(currTimePlusFour.getDay());    //Today's Weekday Name + 4 days
-                    var weekDayNamePlusFive = getWeekdayName(currTimePlusFive.getDay());    //Today's Weekday Name + 5 days
-                        //DEBUG
-                        //alert("weekDayName: " + weekDayName + "\n" +
-                        //"weekDayNamePlusOne: " + weekDayNamePlusOne + "\n" +
-                        //"weekDayNamePlusTwo: " + weekDayNamePlusTwo + "\n" +
-                        //"weekDayNamePlusThree: " + weekDayNamePlusThree + "\n" +
-                        //"weekDayNamePlusFour: " + weekDayNamePlusFour + "\n" +
-                        //"weekDayNamePlusFive: " + weekDayNamePlusFive);
+            //Store month name for today and 5 days ahead (for forecasting)
+            var monthName = getMonthName(currTime.getMonth());                    //Function parameter is month number, January is 0. This month's name
+            var monthNamePlusOne = getMonthName(currTimePlusOne.getMonth());      //Current month name + 1 day, typically wont change unless near end of month
+            var monthNamePlusTwo = getMonthName(currTimePlusTwo.getMonth());      //Current month name + 2 days, typically wont change unless near end of month
+            var monthNamePlusThree = getMonthName(currTimePlusThree.getMonth());  //Current month name + 3 days, typically wont change unless near end of month
+            var monthNamePlusFour = getMonthName(currTimePlusFour.getMonth());    //Current month name + 4 days, typically wont change unless near end of month
+            var monthNamePlusFive = getMonthName(currTimePlusFive.getMonth());    //Current month name + 5 days, typically wont change unless near end of month
+                //DEBUG
+                //alert("monthName: " + monthName + "\n" +
+                //"monthNamePlusOne: " + monthNamePlusOne + "\n" +
+                //"monthNamePlusTwo: " + monthNamePlusTwo + "\n" +
+                //"monthNamePlusThree: " + monthNamePlusThree + "\n" +
+                //"monthNamePlusFour: " + monthNamePlusFour + "\n" +
+                //"monthNamePlusFive: " + monthNamePlusFive);
 
-                    //Get month name function
-                    function getMonthName(monthNumber) {
-                        switch (monthNumber) {
-                            case 0:
-                                return "Jan";
-                            case 1:
-                                return "Feb";
-                            case 2:
-                                return "Mar";
-                            case 3:
-                                return "Apr";
-                            case 4:
-                                return "May";
-                            case 5:
-                                return "Jun";
-                            case 6:
-                                return "Jul";
-                            case 7:
-                                return "Aug";
-                            case 8:
-                                return "Sep";
-                            case 9:
-                                return "Oct";
-                            case 10:
-                                return "Nov";
-                            case 11:
-                                return "Dec";
-                            default:
-                                return "Err";
-                        }//End case
-                    }//End getMonthName function
+            //Store day date for today and 5 days ahead (for forecasting)
+            var day = currTime.getDate();                          //Current Day Date, 0 to 31
+            var dayPlusOne = currTimePlusOne.getDate();			   //Current Day Date + 1 day
+            var dayPlusTwo = currTimePlusTwo.getDate();			   //Current Day Date + 2 days
+            var dayPlusThree = currTimePlusThree.getDate();		   //Current Day Date + 3 days
+            var dayPlusFour = currTimePlusFour.getDate();		   //Current Day Date + 4 days
+            var dayPlusFive = currTimePlusFive.getDate();	 	   //Current Day Date + 5 days
+                //DEBUG
+                //alert("day =" + day + "\n" +
+                //"dayPlusOne =" + dayPlusOne + "\n" +
+                //"dayPlusTwo =" + dayPlusTwo + "\n" +
+                //"dayPlusThree =" + dayPlusThree + "\n" +
+                //"dayPlusFour =" + dayPlusFour + "\n" +
+                //"dayPlusFive =" + dayPlusFive);
 
-                    //Store month name for today and 5 days ahead (for forecasting)
-                    var monthName = getMonthName(currTime.getMonth());                    //Function parameter is month number, January is 0. This month's name
-                    var monthNamePlusOne = getMonthName(currTimePlusOne.getMonth());      //Current month name + 1 day, typically wont change unless near end of month
-                    var monthNamePlusTwo = getMonthName(currTimePlusTwo.getMonth());      //Current month name + 2 days, typically wont change unless near end of month
-                    var monthNamePlusThree = getMonthName(currTimePlusThree.getMonth());  //Current month name + 3 days, typically wont change unless near end of month
-                    var monthNamePlusFour = getMonthName(currTimePlusFour.getMonth());    //Current month name + 4 days, typically wont change unless near end of month
-                    var monthNamePlusFive = getMonthName(currTimePlusFive.getMonth());    //Current month name + 5 days, typically wont change unless near end of month
-                        //DEBUG
-                        //alert("monthName: " + monthName + "\n" +
-                        //"monthNamePlusOne: " + monthNamePlusOne + "\n" +
-                        //"monthNamePlusTwo: " + monthNamePlusTwo + "\n" +
-                        //"monthNamePlusThree: " + monthNamePlusThree + "\n" +
-                        //"monthNamePlusFour: " + monthNamePlusFour + "\n" +
-                        //"monthNamePlusFive: " + monthNamePlusFive);
+            var dateString = monthName + " " + day + " (" + weekDayName + ")";     //Formatted string date. Ex: Mar 19 (Thu)
+            var dateStringPlusOne = monthNamePlusOne + " " + dayPlusOne + " (" + weekDayNamePlusOne + ")";
+            var dateStringPlusTwo = monthNamePlusTwo + " " + dayPlusTwo + " (" + weekDayNamePlusTwo + ")";
+            var dateStringPlusThree = monthNamePlusThree + " " + dayPlusThree + " (" + weekDayNamePlusThree + ")";
+            var dateStringPlusFour = monthNamePlusFour + " " + dayPlusFour + " (" + weekDayNamePlusFour + ")";
+            var dateStringPlusFive = monthNamePlusFive + " " + dayPlusFive + " (" + weekDayNamePlusFive + ")";
+                //DEBUG
+                //alert("dateString = " + dateString + "\n" +
+                //"dateStringPlusOne = " + dateStringPlusOne + "\n" +
+                //"dateStringPlusTwo = " + dateStringPlusTwo + "\n" +
+                //"dateStringPlusThree = " + dateStringPlusThree + "\n" +
+                //"dateStringPlusFour = " + dateStringPlusFour + "\n" +
+                //"dateStringPlusFive = " + dateStringPlusFive);
+
+            var dateStringArr = []; //Store dateStrings in array to be returned
+            dateStringArr[0] = dateString;
+            dateStringArr[1] = dateStringPlusOne;
+            dateStringArr[2] = dateStringPlusTwo;
+            dateStringArr[3] = dateStringPlusThree;
+            dateStringArr[4] = dateStringPlusFour;
+            dateStringArr[5] = dateStringPlusFive;
+
+            return dateStringArr;
+        }//END - GET DATES (Today and Five subsequent days)
+
+
+        function weatherReportByLocation() { // triggered with 'Get Weather Report' button on SEARCH page
+
+            $("#weatherResult").hide(); //hide table (if user re-enters new data and table has been displayed)
+            $("#loading").show();       //shows loading gif
+            
+            //START - GET USER INPUT
+                //Get user entered city.
+                var citySearch = document.getElementById("cityInput").value;
+                //DEBUG
+                //alert("citySearch: " + citySearch);
+
+                //Get user chosen country. REF: http://www.trottyzone.com/using-javascript-get-value-input-select/
+                var countrySelectInput = document.getElementById("countryInput");
+                var countryChosen = countrySelectInput.value;
+                //DEBUG
+                //alert("countryChosen: " + countryChosen);    
+            //END - GET USER INPUT
+
+            var dateStringArr = calcDates(); //calculates dates for current date and subseqent 5-days
+
+            //Add to page, current day's DATE, day + 1 Date, day + 2 Date, day + 3 Date. day + 4 Date, day + 5 Date
+            document.getElementById("currDay").innerText = dateStringArr[0];
+            document.getElementById("dayPlusOne").innerText = dateStringArr[1];
+            document.getElementById("dayPlusTwo").innerText = dateStringArr[2];
+            document.getElementById("dayPlusThree").innerText = dateStringArr[3];
+            document.getElementById("dayPlusFour").innerText = dateStringArr[4];
+            document.getElementById("dayPlusFive").innerText = dateStringArr[5];
+
+            var currTempCelciusInt, currIconURL, currLong, currLat; //Store the CURRENT weather report                
+            function currentWeather() {	//Get current weather from third-party JSON API
+                //REF: http://www.jquerybyexample.net/2012/05/how-to-read-and-parse-json-using-jquery.html
+                var currWeatherJSON = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
+
+                //START - JSON TEXT EXAMPLE
+                //{  
+                //    "coord":{  
+                //        "lon":-88.99,
+                //        "lat":40.51
+                //    },
+                //    "sys":{  
+                //        "type":1,
+                //        "id":953,
+                //        "message":0.0109,
+                //        "country":"US",
+                //        "sunrise":1426680102,
+                //        "sunset":1426723565
+                //    },
+                //    "weather":[  
+                //        {  
+                //            "id":800,
+                //            "main":"Clear",
+                //            "description":"sky is clear",
+                //            "icon":"01d"
+                //        }
+                //    ],
+                //    "base":"cmc stations",
+                //    "main":{  
+                //        "temp":280.35,
+                //        "pressure":1026,
+                //        "humidity":33,
+                //        "temp_min":279.82,
+                //        "temp_max":281.15
+                //    },
+                //    "wind":{  
+                //        "speed":5.1,
+                //        "deg":100
+                //    },
+                //    "clouds":{  
+                //        "all":1
+                //    },
+                //    "dt":1426703094,
+                //    "id":4903780,
+                //    "name":"Normal",
+                //    "cod":200
+                //}
+                //END - JSON TEXT EXAMPLE
+
+                //DEBUG [Test if $.getJson works with other content]
+                //$.getJSON("https://graph.facebook.com/btaylor", function(person){
+                //    $.each(person, function(key, value){
+                //    	alert("facebook: "+key+": "+value)
+                //    });
+                //});
                     
-                    //Store day date for today and 5 days ahead (for forecasting)
-                    var day = currTime.getDate();                          //Current Day Date, 0 to 31
-                    var dayPlusOne = currTimePlusOne.getDate();
-                    var dayPlusTwo = currTimePlusTwo.getDate();
-                    var dayPlusThree = currTimePlusThree.getDate();
-                    var dayPlusFour = currTimePlusFour.getDate();
-                    var dayPlusFive = currTimePlusFive.getDate();
-                        //DEBUG
-                        //alert("day =" + day + "\n" +
-                        //"dayPlusOne =" + dayPlusOne + "\n" +
-                        //"dayPlusTwo =" + dayPlusTwo + "\n" +
-                        //"dayPlusThree =" + dayPlusThree + "\n" +
-                        //"dayPlusFour =" + dayPlusFour + "\n" +
-                        //"dayPlusFive =" + dayPlusFive);
+                $.getJSON(currWeatherJSON, function (currentWeather) { //Parse CURRENT weather report JSON
+                    //DEBUG
+                    //console.log("dataJSON currentWeather.coord.lon: " + currentWeather.coord.lon);
+                    //console.log("temp : " + currentWeather.main.temp);
 
-                    dateString = monthName + " " + day + " (" + weekDayName + ")";     //Formatted string date. Ex: Mar 19 (Thu)
-                    dateStringPlusOne = monthNamePlusOne + " " + dayPlusOne + " (" + weekDayNamePlusOne + ")";
-                    dateStringPlusTwo = monthNamePlusTwo + " " + dayPlusTwo + " (" + weekDayNamePlusTwo + ")";
-                    dateStringPlusThree = monthNamePlusThree + " " + dayPlusThree + " (" + weekDayNamePlusThree + ")";
-                    dateStringPlusFour = monthNamePlusFour + " " + dayPlusFour + " (" + weekDayNamePlusFour + ")";
-                    dateStringPlusFive = monthNamePlusFive + " " + dayPlusFive + " (" + weekDayNamePlusFive + ")";
-                        //DEBUG
-                        //alert("dateString = " + dateString + "\n" +
-                        //"dateStringPlusOne = " + dateStringPlusOne + "\n" +
-                        //"dateStringPlusTwo = " + dateStringPlusTwo + "\n" +
-                        //"dateStringPlusThree = " + dateStringPlusThree + "\n" +
-                        //"dateStringPlusFour = " + dateStringPlusFour + "\n" +
-                        //"dateStringPlusFive = " + dateStringPlusFive);
+                    //Get temperature and convert from Kelvin to Celcius
+                    var tempKelvinString = currentWeather.main.temp;
+                    var tempKelvinInt = parseInt(tempKelvinString);
+                    currTempCelciusRaw = tempKelvinInt - 275.15;
+                    currTempCelciusInt = currTempCelciusRaw.toFixed(2) + " &#8451;";
 
-					//Add to page, current day's DATE, day + 1 Date, day + 2 Date, day + 3 Date. day + 4 Date, day + 5 Date
-					document.getElementById("currDay").innerText = dateString;
-					document.getElementById("dayPlusOne").innerText = dateStringPlusOne;
-					document.getElementById("dayPlusTwo").innerText = dateStringPlusTwo;
-					document.getElementById("dayPlusThree").innerText = dateStringPlusThree;
-					document.getElementById("dayPlusFour").innerText = dateStringPlusFour;
-					document.getElementById("dayPlusFive").innerText = dateStringPlusFive;
+                    document.getElementById("currTemp").innerHTML = currTempCelciusInt;
 
-                }//END - GET DATES (Today and Five subsequent days)
-
-                calcDates(); //calculates dates for current date and subseqent 5-days
-
-                var currTempCelciusInt, currIconURL, currLong, currLat; //Store the CURRENT weather report                
-                function currentWeather() {	//Get current weather from third-party JSON API
-                    //Ref: http://www.jquerybyexample.net/2012/05/how-to-read-and-parse-json-using-jquery.html
-                    var currWeatherJSON = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
-
-                             //START - JSON TEXT EXAMPLE
-                                 //{  
-                                 //    "coord":{  
-                                 //        "lon":-88.99,
-                                 //        "lat":40.51
-                                 //    },
-                                 //    "sys":{  
-                                 //        "type":1,
-                                 //        "id":953,
-                                 //        "message":0.0109,
-                                 //        "country":"US",
-                                 //        "sunrise":1426680102,
-                                 //        "sunset":1426723565
-                                 //    },
-                                 //    "weather":[  
-                                 //        {  
-                                 //            "id":800,
-                                 //            "main":"Clear",
-                                 //            "description":"sky is clear",
-                                 //            "icon":"01d"
-                                 //        }
-                                 //    ],
-                                 //    "base":"cmc stations",
-                                 //    "main":{  
-                                 //        "temp":280.35,
-                                 //        "pressure":1026,
-                                 //        "humidity":33,
-                                 //        "temp_min":279.82,
-                                 //        "temp_max":281.15
-                                 //    },
-                                 //    "wind":{  
-                                 //        "speed":5.1,
-                                 //        "deg":100
-                                 //    },
-                                 //    "clouds":{  
-                                 //        "all":1
-                                 //    },
-                                 //    "dt":1426703094,
-                                 //    "id":4903780,
-                                 //    "name":"Normal",
-                                 //    "cod":200
-                                 //}
-                             //END - JSON TEXT EXAMPLE
-
-                         //DEBUG [Test if $.getJson works with other content]
-				         //$.getJSON("https://graph.facebook.com/btaylor", function(person){
-                         //    $.each(person, function(key, value){
-				         //    	alert("facebook: "+key+": "+value)
-				         //    });
-				         //});
-                    
-                    $.getJSON(currWeatherJSON, function (currentWeather) { //Parse CURRENT weather report JSON
-                            //DEBUG
-                            console.log("dataJSON currentWeather.coord.lon: " + currentWeather.coord.lon);
-                            console.log("temp : " + currentWeather.main.temp);
-
-                        //Get temperature and convert from Kelvin to Celcius
-                        var tempKelvinString = currentWeather.main.temp;
-                        var tempKelvinInt = parseInt(tempKelvinString);
-                        currTempCelciusRaw = tempKelvinInt - 275.15;
-                        currTempCelciusInt = currTempCelciusRaw.toFixed(2) + " &#8451;";
-
-                        document.getElementById("currTemp").innerHTML = currTempCelciusInt;
-
-                        //Get icon code and append to url to retrieve weather icon 
-                        $.each(currentWeather.weather, function (key, value) {
-                            var iconURLCode = value.icon;
-                            currIconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
-                            console.log("iconURLCode: " + value.icon);
-                        });
-                            
-                        document.getElementById("currIcon").innerHTML = "<img src='" + currIconURL + "' alt='weather icon'/>";
-
-                        //Get longitude and latitude
-                        currLong = currentWeather.coord.lon;
-                        currLat = currentWeather.coord.lat;
-                    	//Add to page, current day longtitude and latitude
-                        document.getElementById("currLat").innerText = currLat.toFixed(2);
-                        document.getElementById("currLon").innerText = currLong.toFixed(2);
+                    //Get icon code and append to url to retrieve weather icon 
+                    $.each(currentWeather.weather, function (key, value) {
+                        var iconURLCode = value.icon;
+                        currIconURL = "http://openweathermap.org/img/w/" + iconURLCode + ".png";
+                        //console.log("iconURLCode: " + value.icon);
                     });
-                }//END currentWeather() function
+                            
+                    document.getElementById("currIcon").innerHTML = "<img src='" + currIconURL + "' alt='weather icon'/>";
 
-                currentWeather();   //get current weather report
+                    //Get longitude and latitude
+                    currLong = currentWeather.coord.lon;
+                    currLat = currentWeather.coord.lat;
+                    //Add to page, current day longtitude and latitude
+                    document.getElementById("currLat").innerText = currLat.toFixed(2);
+                    document.getElementById("currLon").innerText = currLong.toFixed(2);
+                });
+            }//END currentWeather() function
 
-                //Store the 5 DAY WEATHER FORECAST report: temperature and icons
-                var tempCelciusFiveDaysForecast = [];
-                var iconURLFiveDaysForecast = [];
+            currentWeather();   //get current weather report
 
-                function forecastWeather() { //START - 5 DAY WEATHER FORECAST JSON and parse the weather report
-                    var forecastWeatherJSON = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + citySearch + "," + countryChosen + "&units=metric&cnt=6";
+            //Store the 5 DAY WEATHER FORECAST report: temperature and icons
+            var tempCelciusFiveDaysForecast = [];
+            var iconURLFiveDaysForecast = [];
 
-                            //START - JSON TEXT EXAMPLE
-                            //{  
-                            //    "cod":"200",
-                            //    "message":0.0402,
-                            //    "city":{  
-                            //        "id":2643743,
-                            //        "name":"London",
-                            //        "coord":{  
-                            //            "lon":-0.12574,
-                            //            "lat":51.50853
-                            //        },
-                            //        "country":"GB",
-                            //        "population":0,
-                            //        "sys":{  
-                            //            "population":0
-                            //        }
-                            //    },
-                            //    "cnt":6,
-                            //    "list":[  
-                            //        {  
-                            //            "dt":1426852800,
-                            //            "temp":{  
-                            //                "day":9.26,
-                            //                "min":8.64,
-                            //                "max":9.26,
-                            //                "night":8.64,
-                            //                "eve":9.26,
-                            //                "morn":9.26
-                            //            },
-                            //            "pressure":1032.61,
-                            //            "humidity":85,
-                            //            "weather":[  
-                            //                {  
-                            //                    "id":500,
-                            //                    "main":"Rain",
-                            //                    "description":"light rain",
-                            //                    "icon":"10n"
-                            //                }
-                            //            ],
-                            //            "speed":3.47,
-                            //            "deg":302,
-                            //            "clouds":80
-                            //        },
-                            //END - JSON TEXT EXAMPLE
+            function forecastWeather() { //START - 5 DAY WEATHER FORECAST JSON and parse the weather report
+                var forecastWeatherJSON = "http://api.openweathermap.org/data/2.5/forecast/daily?q=" + citySearch + "," + countryChosen + "&units=metric&cnt=6";
+
+                //START - JSON TEXT EXAMPLE
+                //{  
+                //    "cod":"200",
+                //    "message":0.0402,
+                //    "city":{  
+                //        "id":2643743,
+                //        "name":"London",
+                //        "coord":{  
+                //            "lon":-0.12574,
+                //            "lat":51.50853
+                //        },
+                //        "country":"GB",
+                //        "population":0,
+                //        "sys":{  
+                //            "population":0
+                //        }
+                //    },
+                //    "cnt":6,
+                //    "list":[  
+                //        {  
+                //            "dt":1426852800,
+                //            "temp":{  
+                //                "day":9.26,
+                //                "min":8.64,
+                //                "max":9.26,
+                //                "night":8.64,
+                //                "eve":9.26,
+                //                "morn":9.26
+                //            },
+                //            "pressure":1032.61,
+                //            "humidity":85,
+                //            "weather":[  
+                //                {  
+                //                    "id":500,
+                //                    "main":"Rain",
+                //                    "description":"light rain",
+                //                    "icon":"10n"
+                //                }
+                //            ],
+                //            "speed":3.47,
+                //            "deg":302,
+                //            "clouds":80
+                //        },
+                //END - JSON TEXT EXAMPLE
                     
-                    $.getJSON(forecastWeatherJSON, function (forecast) {  //Parse 5 Day weather forecast JSON
-                            //console.log("forecast city name: " + forecast.city.name);
-                            //console.log("forecast city country: " + forecast.city.country);
-                        $.each(forecast.list, function (key, value) {
-                        	tempCelciusFiveForecastRaw = value.temp.day;								                        	
-                            tempCelciusFiveDaysForecast.push(tempCelciusFiveForecastRaw.toFixed(2) + " &#8451;");	//Celcius symbol
-                                //console.log("each forecast forecast.list  [" + value.temp.day + "]");
-                            $.each(value.weather, function (key, value) {
-                                iconURLFiveDaysForecast.push("http://openweathermap.org/img/w/"+value.icon+".png");
-                                    //console.log("each forecast forecast.list.weather  [" + value.icon + "]");
-                            });//END $.each forecast.list.weather function
-                        });//END $.each forecast.list function
-                            //console.log("tempCelciusFiveDaysForecast: " + tempCelciusFiveDaysForecast);
-                            //console.log("iconURLFiveDaysForecast: " + iconURLFiveDaysForecast);
-                    	//Add to page, Current Day + One
-                    	document.getElementById("iconPlusOne").innerHTML = "<img src='"+iconURLFiveDaysForecast[1]+"' alt='weather icon'/>";
-                    	document.getElementById("tempPlusOne").innerHTML = tempCelciusFiveDaysForecast[1];
-                		//Add to page, Current Day + Two
-                		document.getElementById("iconPlusTwo").innerHTML = "<img src='"+iconURLFiveDaysForecast[2]+"' alt='weather icon'/>";
-                    	document.getElementById("tempPlusTwo").innerHTML = tempCelciusFiveDaysForecast[2];
-                    	//Add to page, Current Day + Three
-                		document.getElementById("iconPlusThree").innerHTML = "<img src='"+iconURLFiveDaysForecast[3]+"' alt='weather icon'/>";
-                    	document.getElementById("tempPlusThree").innerHTML = tempCelciusFiveDaysForecast[3];
-                    	//Add to page, Current Day + Four
-                		document.getElementById("iconPlusFour").innerHTML = "<img src='"+iconURLFiveDaysForecast[4]+"' alt='weather icon'/>";
-                    	document.getElementById("tempPlusFour").innerHTML = tempCelciusFiveDaysForecast[4];
-                    	//Add to page, Current Day + Five
-                		document.getElementById("iconPlusFive").innerHTML = "<img src='"+iconURLFiveDaysForecast[5]+"' alt='weather icon'/>";
-                    	document.getElementById("tempPlusFive").innerHTML = tempCelciusFiveDaysForecast[5];
-                    });//END $.getJSON function
-                }//END - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
+                $.getJSON(forecastWeatherJSON, function (forecast) {  //Parse 5 Day weather forecast JSON
+                    //console.log("forecast city name: " + forecast.city.name);
+                    //console.log("forecast city country: " + forecast.city.country);
+                    $.each(forecast.list, function (key, value) {
+                        tempCelciusFiveForecastRaw = value.temp.day;								                        	
+                        tempCelciusFiveDaysForecast.push(tempCelciusFiveForecastRaw.toFixed(2) + " &#8451;");	//Celcius symbol
+                            //console.log("each forecast forecast.list  [" + value.temp.day + "]");
+                        $.each(value.weather, function (key, value) {
+                            iconURLFiveDaysForecast.push("http://openweathermap.org/img/w/"+value.icon+".png");
+                                //console.log("each forecast forecast.list.weather  [" + value.icon + "]");
+                        });//END $.each forecast.list.weather function
+                    });//END $.each forecast.list function
+                        //console.log("tempCelciusFiveDaysForecast: " + tempCelciusFiveDaysForecast);
+                        //console.log("iconURLFiveDaysForecast: " + iconURLFiveDaysForecast);
+                    //Add to page, Current Day + One [Icon and Temperature]
+                    document.getElementById("iconPlusOne").innerHTML = "<img src='"+iconURLFiveDaysForecast[1]+"' alt='weather icon'/>";
+                    document.getElementById("tempPlusOne").innerHTML = tempCelciusFiveDaysForecast[1];
+                    //Add to page, Current Day + Two [Icon and Temperature]
+                    document.getElementById("iconPlusTwo").innerHTML = "<img src='"+iconURLFiveDaysForecast[2]+"' alt='weather icon'/>";
+                    document.getElementById("tempPlusTwo").innerHTML = tempCelciusFiveDaysForecast[2];
+                    //Add to page, Current Day + Three [Icon and Temperature]
+                    document.getElementById("iconPlusThree").innerHTML = "<img src='"+iconURLFiveDaysForecast[3]+"' alt='weather icon'/>";
+                    document.getElementById("tempPlusThree").innerHTML = tempCelciusFiveDaysForecast[3];
+                    //Add to page, Current Day + Four [Icon and Temperature]
+                    document.getElementById("iconPlusFour").innerHTML = "<img src='"+iconURLFiveDaysForecast[4]+"' alt='weather icon'/>";
+                    document.getElementById("tempPlusFour").innerHTML = tempCelciusFiveDaysForecast[4];
+                    //Add to page, Current Day + Five [Icon and Temperature]
+                    document.getElementById("iconPlusFive").innerHTML = "<img src='"+iconURLFiveDaysForecast[5]+"' alt='weather icon'/>";
+                    document.getElementById("tempPlusFive").innerHTML = tempCelciusFiveDaysForecast[5];
+                });//END $.getJSON function
+            }//END - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
                 
-                forecastWeather(); //gets 5 day forecast weather report
-                    //console.log("EXIT SCRIPT");               
-
-                $("#weatherResult").fadeIn(900); //Display weather report table 
-            }	// END - weatherReportByLocation() function
-
-            function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
-
+            forecastWeather(); //gets 5 day forecast weather report
+            //console.log("EXIT SCRIPT");               
+            
+            window.setTimeout(function () { $("#loading").hide(); }, 4999 );            //Hide loading gif after 4.9 sec
+            window.setTimeout(function () { $("#weatherResult").fadeIn(5000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
+        }	// END - weatherReportByLocation() function
 
 
 
-            }	// END - weatherReportByGPS() function
-        </script>
+        function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
+
+            function onSuccess(res) {
+                var d = new Date(res.timestamp);
+                var timestamp = d.toLocaleString();
+                alert("GPS timestamp: " + timestamp);
+            }
+
+            function onFailure() {
+                alert("GPS failure");
+            }
+
+            navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
+
+
+            //function currPosition() {
+                
+            //    if (navigator.geolocation) {
+
+            //        function onSuccess(res) {
+            //            var d = new Date(res.timestamp);
+            //            var timestamp = d.toLocaleString();
+            //            console.log("GPS timestamp: " + timestamp);
+            //        }
+
+            //        function onFailure() {
+            //            console.log("GPS failure");
+            //        }
+
+            //        navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
+            //    }
+            //}
+
+            //currPosition();
+
+        }	// END - weatherReportByGPS() function
+    </script>
     </head>
     <body>
         <div id="home" data-role="page"><!-- start home page -->
@@ -447,7 +504,9 @@
                 <a href="javascript:weatherReportByLocation()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Weather</a><!-- submit Button -->
                 
                 <br/>
-                
+
+                <div id="loading" style="text-align:center"><img src="css/images/ajax-loader.gif" alt="loading"/></div>
+
                 <div id="weatherResult"><!-- start weatherResult -->
                     <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT</p>
                     <div id="currentWeatherResultTable"><!-- start currentWeatherResultTable -->
