@@ -411,10 +411,22 @@
 
         function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
 
-            function onSuccess(res) {
-                var d = new Date(res.timestamp);
-                var timestamp = d.toLocaleString();
-                alert("GPS timestamp: " + timestamp);
+            function alertDismissed() {
+                //lala
+            }
+
+            function showAlert() {
+            navigator.notification.alert("nav notification works!", alertDismissed, "Game Over", "Done");
+            }
+
+            showAlert();
+            return false;
+
+
+            function onSuccess() {
+                //var d = new Date(res.timestamp);
+                //var timestamp = d.toLocaleString();
+                alert("GPS success");
             }
 
             function onFailure() {
@@ -425,7 +437,7 @@
 
 
             //function currPosition() {
-                
+
             //    if (navigator.geolocation) {
 
             //        function onSuccess(res) {
