@@ -415,22 +415,23 @@
                 //lala
             }
 
-            function showAlert() {
-            navigator.notification.alert("nav notification works!", alertDismissed, "Game Over", "Done");
-            }
+            //function showAlert() {
+            //    navigator.notification.alert("nav notification works!", alertDismissed, "Game Over", "Done");
+            //}
 
-            showAlert();
-            return false;
-
+            //showAlert();
 
             function onSuccess() {
                 //var d = new Date(res.timestamp);
                 //var timestamp = d.toLocaleString();
-                alert("GPS success");
+                //console.log("GPS success");
+                
+                navigator.notification.alert("GPS works", alertDismissed, "GPS", "OK");
             }
 
             function onFailure() {
-                alert("GPS failure");
+                navigator.notification.alert("GPS doesnt work", alertDismissed, "GPS", "OK");
+                //console.log("GPS failure");
             }
 
             navigator.geolocation.getCurrentPosition(onSuccess, onFailure);
