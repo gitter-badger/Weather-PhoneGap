@@ -45,7 +45,7 @@
             }
         </style>
         <script>
-            function weatherReport() { // triggered with 'Get Weather Report' button
+            function weatherReportByLocation() { // triggered with 'Get Weather Report' button on SEARCH page
                 //START - GET USER INPUT
                     //Get user entered city.
                     var citySearch = document.getElementById("cityInput").value;
@@ -190,13 +190,21 @@
                         //"dateStringPlusThree = " + dateStringPlusThree + "\n" +
                         //"dateStringPlusFour = " + dateStringPlusFour + "\n" +
                         //"dateStringPlusFive = " + dateStringPlusFive);
+
+					//Add to page, current day's DATE, day + 1 Date, day + 2 Date, day + 3 Date. day + 4 Date, day + 5 Date
+					document.getElementById("currDay").innerText = dateString;
+					document.getElementById("dayPlusOne").innerText = dateStringPlusOne;
+					document.getElementById("dayPlusTwo").innerText = dateStringPlusTwo;
+					document.getElementById("dayPlusThree").innerText = dateStringPlusThree;
+					document.getElementById("dayPlusFour").innerText = dateStringPlusFour;
+					document.getElementById("dayPlusFive").innerText = dateStringPlusFive;
+
                 }//END - GET DATES (Today and Five subsequent days)
 
                 calcDates(); //calculates dates for current date and subseqent 5-days
 
-                var currTempCelciusInt, currIconURL, currLong, currLat; //Store the CURRENT weather report
-                //Get current weather from third-party JSON API
-                function currentWeather() {
+                var currTempCelciusInt, currIconURL, currLong, currLat; //Store the CURRENT weather report                
+                function currentWeather() {	//Get current weather from third-party JSON API
                     //Ref: http://www.jquerybyexample.net/2012/05/how-to-read-and-parse-json-using-jquery.html
                     var currWeatherJSON = "http://api.openweathermap.org/data/2.5/weather?q=" + citySearch + "," + countryChosen;
 
@@ -276,7 +284,7 @@
                         //Get longitude and latitude
                         currLong = currentWeather.coord.lon;
                         currLat = currentWeather.coord.lat;
-
+                    	//Add to page, current day longtitude and latitude
                         document.getElementById("currLat").innerText = currLat.toFixed(2);
                         document.getElementById("currLon").innerText = currLong.toFixed(2);
                     });
@@ -335,13 +343,13 @@
                             //            "clouds":80
                             //        },
                             //END - JSON TEXT EXAMPLE
-
                     
                     $.getJSON(forecastWeatherJSON, function (forecast) {  //Parse 5 Day weather forecast JSON
                             //console.log("forecast city name: " + forecast.city.name);
                             //console.log("forecast city country: " + forecast.city.country);
                         $.each(forecast.list, function (key, value) {
-                            tempCelciusFiveDaysForecast.push(value.temp.day);
+                        	tempCelciusFiveForecastRaw = value.temp.day;								                        	
+                            tempCelciusFiveDaysForecast.push(tempCelciusFiveForecastRaw.toFixed(2) + " &#8451;");	//Celcius symbol
                                 //console.log("each forecast forecast.list  [" + value.temp.day + "]");
                             $.each(value.weather, function (key, value) {
                                 iconURLFiveDaysForecast.push("http://openweathermap.org/img/w/"+value.icon+".png");
@@ -350,75 +358,37 @@
                         });//END $.each forecast.list function
                             //console.log("tempCelciusFiveDaysForecast: " + tempCelciusFiveDaysForecast);
                             //console.log("iconURLFiveDaysForecast: " + iconURLFiveDaysForecast);
+                    	//Add to page, Current Day + One
+                    	document.getElementById("iconPlusOne").innerHTML = "<img src='"+iconURLFiveDaysForecast[1]+"' alt='weather icon'/>";
+                    	document.getElementById("tempPlusOne").innerHTML = tempCelciusFiveDaysForecast[1];
+                		//Add to page, Current Day + Two
+                		document.getElementById("iconPlusTwo").innerHTML = "<img src='"+iconURLFiveDaysForecast[2]+"' alt='weather icon'/>";
+                    	document.getElementById("tempPlusTwo").innerHTML = tempCelciusFiveDaysForecast[2];
+                    	//Add to page, Current Day + Three
+                		document.getElementById("iconPlusThree").innerHTML = "<img src='"+iconURLFiveDaysForecast[3]+"' alt='weather icon'/>";
+                    	document.getElementById("tempPlusThree").innerHTML = tempCelciusFiveDaysForecast[3];
+                    	//Add to page, Current Day + Four
+                		document.getElementById("iconPlusFour").innerHTML = "<img src='"+iconURLFiveDaysForecast[4]+"' alt='weather icon'/>";
+                    	document.getElementById("tempPlusFour").innerHTML = tempCelciusFiveDaysForecast[4];
+                    	//Add to page, Current Day + Five
+                		document.getElementById("iconPlusFive").innerHTML = "<img src='"+iconURLFiveDaysForecast[5]+"' alt='weather icon'/>";
+                    	document.getElementById("tempPlusFive").innerHTML = tempCelciusFiveDaysForecast[5];
                     });//END $.getJSON function
                 }//END - Get the 5 DAY WEATHER FORECAST JSON and parse the weather report information
                 
                 forecastWeather(); //gets 5 day forecast weather report
-                    //console.log("EXIT SCRIPT");
+                    //console.log("EXIT SCRIPT");               
 
-                //START - create table and populate with current and forecast weather
+                $("#weatherResult").fadeIn(900); //Display weather report table 
+            }	// END - weatherReportByLocation() function
 
-                //var currentWeatherTable =
-                //+ "<table data-role='table' data-mode='reflow' class='ui-body-d ui-shadow table-stripe'>"
-                //    + "<thead>"
-                //        + "<tr>"
-                //            + "<th>Day</th>"
-                //            + "<th>Icon</th>"
-                //            + "<th>Celcius</th>"
-                //            + "<th>Latitude</th>"
-                //            + "<th>Longitude</th>"
-                //        + "</tr>"
-                //    + "</thead>"
-                //    + "<tbody>"
-                //        + "<tr>"
-                //            + "<th>" + dateString + "</th>"
-                //            + "<td><img src="+currIconURL+" alt='weather icon'></td>"
-                //            + "<td>" + currTempCelciusInt + "</td>"
-                //            + "<td>" + currLat + "</td>"
-                //            + "<td>" + currLong + "</td>"
-                //        + "</tr>"
-                //    + "</tbody>"
-                //+ "</table>";
-
-                //var currentWeatherTable =
-                //$("#currentWeatherResultTable").html(
-                //+ '<table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">'
-                //    + '<thead>'
-                //        + '<tr>'
-                //            + '<th>Day</th>'
-                //            + '<th>Icon</th>'
-                //            + '<th>Celcius</th>'
-                //            + '<th>Latitude</th>'
-                //            + '<th>Longitude</th>'
-                //        + '</tr>'
-                //    + '</thead>'
-                //    + '<tbody>'
-                //        + '<tr>'
-                //            + '<th>Cow</th>'
-                //            + '<td>Cow</td>'
-                //            + '<td>Cow</td>'
-                //            + '<td>Cow</td>'
-                //            + '<td>Cow</td>'
-                //        + '</tr>'
-                //    + '</tbody>'
-                //+ '</table>'
-                //);
-
-                document.getElementById("currDay").innerText = dateString;
-                
-                
+            function weatherReportByGPS() {		// triggered with 'Get Weather Report' button on GPS page
 
 
-                //var getCurrentTable = document.getElementById("currentWeatherResultTable");
-                //getCurrentTable.innerHTML = currentWeatherTable;
-
-                //END - create table and populate with current and forecast weather
 
 
-                $("#weatherResult").fadeIn(900);
-            }
+            }	// END - weatherReportByGPS() function
         </script>
-        
     </head>
     <body>
         <div id="home" data-role="page"><!-- start home page -->
@@ -426,10 +396,12 @@
                 <img class="image" src="img/backgrdImage.png"/>
             </div><!-- end header -->
 
-            <br/><br/>
+            <br/>
 
 	        <div data-role="content"><!-- start content -->
-	            <p class="ui-btn ui-shadow ui-corner-all label">Choose below</p>
+	            <p class="ui-btn ui-shadow ui-corner-all label">HOME</p>
+	            <br/>
+	            <label style="text-align:center">Get Weather Report by <u>Search</u> or <u>GPS</u></label>
 	        </div><!-- end content -->
 	        
 	        <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
@@ -437,11 +409,13 @@
 	                <ul>
 	                    <li><a href="#home">Home</a>
 	                    <li><a href="#locationEntry">Search</a></li>
-	                    <li><a href="#">GPS</a></li>
+	                    <li><a href="#GPSEntry">GPS</a></li>
 	                </ul>
 	            </div><!-- end navbar -->
 	        </div><!-- end footer -->
         </div><!-- end home page -->
+
+        <!-- END OF HOME PAGE. START OF LOCATION ENTRY PAGE -->
 
         <div id="locationEntry" data-role="page"><!-- start locationEntry page -->
             <div data-role="header" data-position="fixed"><!-- start header -->
@@ -470,42 +444,73 @@
                     <option value="IT">Italy</option>
                 </select>
                 <br/>
-                <a href="javascript:weatherReport()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Get Weather Report</a><!-- submit Button -->
+                <a href="javascript:weatherReportByLocation()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Weather</a><!-- submit Button -->
                 
                 <br/>
                 
                 <div id="weatherResult"><!-- start weatherResult -->
-                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT WEATHER</p>
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT</p>
                     <div id="currentWeatherResultTable"><!-- start currentWeatherResultTable -->
-                        <table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th></th>
-                                <th>Celcius</th>
-                                <th>Latitude</th>
-                                <th>Longitude</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <th><div class="divInline" id="currDay"></div></th>
-                                <td id="currIcon" style="text-align: center"></td>
-                                <td><div class="divInline" id="currTemp"></div></td>
-                                <td><div class="divInline" id="currLat"></div></td>
-                                <td><div class="divInline" id="currLon"></div></td>
-                            </tr>
-                        </tbody>
-                    </table>
-
+	                    <table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">
+	                        <thead>
+	                            <tr>
+	                                <th>Date</th>
+	                                <th></th>
+	                                <th>Celcius</th>
+	                                <th>Latitude</th>
+	                                <th>Longitude</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <tr>
+	                                <th><div class="divInline" id="currDay"></div></th>
+	                                <td id="currIcon" style="text-align: center"></td>
+	                                <td><div class="divInline" id="currTemp"></div></td>
+	                                <td><div class="divInline" id="currLat"></div></td>
+	                                <td><div class="divInline" id="currLon"></div></td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
                     </div><!-- end currentWeatherResultTable -->
                     
-                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">FORECAST WEATHER</p>
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">FORECAST</p>
                     <div id="forecastWeatherResultTable"><!-- start forecastWeatherResultTable -->
-
-
-
-
+	                    <table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">
+	                        <thead>
+	                            <tr>
+	                                <th>Date</th>
+	                                <th></th>
+	                                <th>Celcius</th>                                
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusOne"></div></th>
+	                                <td id="iconPlusOne" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusOne"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusTwo"></div></th>
+	                                <td id="iconPlusTwo" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusTwo"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusThree"></div></th>
+	                                <td id="iconPlusThree" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusThree"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusFour"></div></th>
+	                                <td id="iconPlusFour" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusFour"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusFive"></div></th>
+	                                <td id="iconPlusFive" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusFive"></div></td>                                
+	                            </tr>
+	                        </tbody>
+	                    </table>
                     </div><!-- end forecastWeatherResultTable -->
                 </div><!-- end weatherResult -->
             </div><!-- end content -->
@@ -515,10 +520,121 @@
 	                <ul>
 	                    <li><a href="#home">Home</a>
 	                    <li><a href="#locationEntry">Search</a></li>
-	                    <li><a href="#">GPS</a></li>
+	                    <li><a href="#GPSEntry">GPS</a></li>
 	                </ul>
 	            </div><!-- end navbar -->
 	        </div><!-- end footer -->
         </div><!-- end locationEntry page -->
+		
+		<!-- END OF LOCATION ENTRY PAGE. START OF GPS ENTRY PAGE -->
+
+		<div id="GPSEntry" data-role="page"><!-- start GPSEntry page -->
+            <div data-role="header" data-position="fixed"><!-- start header -->
+                <img class="image" src="img/headerImage.png"/>
+            </div><!-- end header -->
+
+            <div data-role="content"><!-- start content -->
+                <p class="ui-btn ui-shadow ui-corner-all label">GPS</p>
+                <br/>
+                <!-- <label for="cityInput">City:</label>
+                <input type="text" name="cityInput" id="cityInput" value="normal"/>
+                <label>Remove Normal from INPUT</label>
+                <label for="countryInput">Country:</label>
+                <select name="countryInput" id="countryInput" data-native-menu="false">
+                    <option selected="selected" value="US">USA</option>
+                    <option value="MY">Malaysia</option>
+                    <option value="CA">Canada</option>
+                    <option value="GB">UK</option>
+                    <option value="DE">Germany</option>
+                    <option value="FR">France</option>
+                    <option value="RU">Russia</option>
+                    <option value="SG">Singapore</option>
+                    <option value="IN">India</option>
+                    <option value="CN">China</option>
+                    <option value="JP">Japan</option>
+                    <option value="IT">Italy</option>
+                </select> -->
+                <br/>
+                <a href="javascript:weatherReportByGPS()" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-top ui-icon-cloud submitButton">Weather</a><!-- submit Button -->
+                
+                <br/>
+                
+                <div id="weatherResultGPS"><!-- start weatherResultGPS -->
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">CURRENT</p>
+                    <div id="currentWeatherResultTableGPS"><!-- start currentWeatherResultTableGPS -->
+	                    <table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">
+	                        <thead>
+	                            <tr>
+	                                <th>Date</th>
+	                                <th></th>
+	                                <th>Celcius</th>
+	                                <th>Latitude</th>
+	                                <th>Longitude</th>
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <tr>
+	                                <th><div class="divInline" id="currDayGPS"></div></th>
+	                                <td id="currIconGPS" style="text-align: center"></td>
+	                                <td><div class="divInline" id="currTempGPS"></div></td>
+	                                <td><div class="divInline" id="currLatGPS"></div></td>
+	                                <td><div class="divInline" id="currLonGPS"></div></td>
+	                            </tr>
+	                        </tbody>
+	                    </table>
+                    </div><!-- end currentWeatherResultTableGPS -->
+                    
+                    <p class="ui-btn ui-shadow ui-corner-all resultOutput">FORECAST</p>
+                    <div id="forecastWeatherResultTableGPS"><!-- start forecastWeatherResultTableGPS -->
+	                    <table data-role="table" data-mode="reflow" class="ui-body-d ui-shadow table-stripe">
+	                        <thead>
+	                            <tr>
+	                                <th>Date</th>
+	                                <th></th>
+	                                <th>Celcius</th>                                
+	                            </tr>
+	                        </thead>
+	                        <tbody>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusOneGPS"></div></th>
+	                                <td id="iconPlusOneGPS" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusOneGPS"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusTwoGPS"></div></th>
+	                                <td id="iconPlusTwoGPS" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusTwoGPS"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusThreeGPS"></div></th>
+	                                <td id="iconPlusThreeGPS" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusThreeGPS"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusFourGPS"></div></th>
+	                                <td id="iconPlusFourGPS" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusFourGPS"></div></td>                                
+	                            </tr>
+	                            <tr>
+	                                <th><div class="divInline" id="dayPlusFiveGPS"></div></th>
+	                                <td id="iconPlusFiveGPS" style="text-align: center"></td>
+	                                <td><div class="divInline" id="tempPlusFiveGPS"></div></td>                                
+	                            </tr>
+	                        </tbody>
+	                    </table>
+                    </div><!-- end forecastWeatherResultTableGPS -->
+                </div><!-- end weatherResultGPS -->
+            </div><!-- end content -->
+
+            <div data-role="footer" data-position="fixed" data-theme="b"><!-- start footer -->
+	            <div data-role="navbar">
+	                <ul>
+	                    <li><a href="#home">Home</a>
+	                    <li><a href="#locationEntry">Search</a></li>
+	                    <li><a href="#GPSEntry">GPS</a></li>
+	                </ul>
+	            </div><!-- end navbar -->
+	        </div><!-- end footer -->
+        </div><!-- end GPSEntry page -->
     </body>
 </html>
