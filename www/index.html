@@ -405,8 +405,8 @@
             forecastWeather(); //gets 6 day forecast weather report
             //console.log("EXIT SCRIPT");               
             
-            window.setTimeout(function () { $(".loading").hide(); }, 4999 );            //Hide loading gif after 4.9 sec
-            window.setTimeout(function () { $("#weatherResult").fadeIn(3000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
+            window.setTimeout(function () { $(".loading").hide(); }, 3999 );            //Hide loading gif after 4.9 sec
+            window.setTimeout(function () { $("#weatherResult").fadeIn(2000); }, 4000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
         }// END - weatherReportByLocation() function
 
 
@@ -506,14 +506,14 @@
                     });//END $.getJSON function
                 //END - Retrieve FORECAST WEATHER (for 6 days) via GPS from API
 
-                    window.setTimeout(function () { $(".loading").hide(); }, 4999);                //Hide loading gif after 4.9 sec
-                    window.setTimeout(function () { $("#weatherResultGPS").fadeIn(3000); }, 5000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
+                    window.setTimeout(function () { $(".loading").hide(); }, 3999);                //Hide loading gif after 4.9 sec
+                    window.setTimeout(function () { $("#weatherResultGPS").fadeIn(2000); }, 4000); //Display weather table after 5 secs, with 5 sec animation to appear, total of 10 secs.
                 });
             }
 
             function onFailure(error) {
                 function navAlertFail() {
-                    window.setTimeout(function () { $(".loading").hide(); }, 4999);                //Hide loading gif after 4.9 sec
+                    window.setTimeout(function () { $(".loading").hide(); }, 3999);                //Hide loading gif after 4.9 sec
                     function alertDismissedFail() {}
                     navigator.notification.alert("Error Code: " + error.code + "\nError Message: " + error.message, alertDismissedFail, "GPS Error", "OK");
                 }
